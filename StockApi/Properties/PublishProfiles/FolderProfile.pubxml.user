@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>D:\Project\Eddie\StockApi\StockApi\bin\Release\net8.0\publish\</_PublishTargetUrl>
+    <History>True|2023-12-06T05:42:37.5810850Z;True|2023-12-06T12:18:38.2251477+08:00;True|2023-12-06T09:50:30.0806617+08:00;False|2023-12-06T09:50:07.9439328+08:00;False|2023-12-06T09:49:44.3301656+08:00;True|2023-12-06T09:47:34.2886926+08:00;False|2023-12-06T09:46:19.3399948+08:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>
