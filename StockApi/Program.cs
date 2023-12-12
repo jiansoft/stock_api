@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using StockApi.Middlewares;
-using StockApi.Models;
 using NLog;
 using NLog.Web;
+using StockApi.Middlewares;
+using StockApi.Models;
 using StockApi.Models.DataProviders;
-using StockApi.Models.HttpTransactions.Stock;
 using StockApi.Models.Services;
 
 namespace StockApi
@@ -30,12 +29,12 @@ namespace StockApi
             builder.Services.AddDbContext<TodoContext>(opt =>
                 opt.UseInMemoryDatabase("TodoList"));
             builder.Services.Configure<AttachmentOptions>(builder.Configuration.GetSection("Attachment"));
-
-            builder.Services.AddScoped<StockService>();
             
             builder.Services.AddScoped<StocksDataProvider>();
             builder.Services.AddScoped<CacheDataProvider>();
-
+            
+            builder.Services.AddScoped<StockService>();
+            
             builder.Services.AddMemoryCache();
 
             var app = builder.Build();
