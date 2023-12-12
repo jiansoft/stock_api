@@ -15,22 +15,22 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
     /// <returns>The stock details.</returns>
     public StocksResult GetStocks(StocksParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             const string table = "stocks";
             const string where = "stock_exchange_market_id in (2, 5)";
 
             using var db = Brook.Load("stock");
-            
-            var recordCount = GetOne(db, table,where);
+
+            var recordCount = GetOne(db, table, where);
             var meta = new Meta(recordCount, param.PageIndex, param.PageSize);
 
             if (recordCount == 0)
             {
                 return new StocksResult(meta, []);
             }
-            
-           
+
+
             var result = new StocksResult(meta, db.Query<StockEntity>(
                 """
                 select
@@ -64,9 +64,9 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public IndustriesResult GetIndustries(IndustriesParam param)
+    public IndustriesResult GetIndustries(IKey param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             using var db = Brook.Load("stock");
 
@@ -79,6 +79,58 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                 """));
         });
 
+        return result;
+    }
+
+    public DividendResult GetDividend(DividendParam param)
+    {
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
+        {
+            using var db = Brook.Load("stock");
+
+            return new DividendResult(db.Query<DividendEntity>(
+                """
+                select
+                    d.security_code as "StockSymbol",
+                    d.year as "Year",
+                    year_of_dividend as "YearOfDividend",
+                    d.quarter as "Quarter",
+                    cash_dividend as "CashDividend",
+                    stock_dividend as "StockDividend",
+                    sum as "Sum",
+                    COALESCE (fs.earnings_per_share,0) AS "EarningsPerShare",
+                    "ex-dividend_date1" as "ExDividendDate1",
+                    "ex-dividend_date2" as "ExDividendDate2",
+                    payable_date1 as "PayableDate1",
+                    payable_date2 as "PayableDate2",
+                    payout_ratio as "PayoutRatio",
+                    cash_dividend/ dq."ClosingPrice" * 100 as "CashDividendYield",
+                    dq."Date" AS previous_trading_day,
+                    dq."ClosingPrice" AS closing_price_on_previous_day
+                from dividend as d
+                left join financial_statement AS fs ON d.security_code = fs.security_code and d.year_of_dividend = fs.year AND d.quarter = fs.quarter
+                left join LATERAL (
+                    select
+                        "Date",
+                        "ClosingPrice"
+                    from
+                        "DailyQuotes" dq
+                    where
+                        dq."SecurityCode" = d.security_code
+                		AND d."ex-dividend_date1" != '-' AND d."ex-dividend_date1" != '尚未公布'
+                        AND dq."Date" < TO_DATE(d."ex-dividend_date1", 'YYYY-MM-DD')
+                    order by 
+                        "Date" desc
+                    limit 1
+                ) dq ON TRUE
+                where d.security_code = @security_code
+                order by d.year desc, year_of_dividend desc, d.quarter desc
+                """, new[]
+                {
+                    db.Parameter("@security_code", param.StockSymbol, DbType.String)
+                }));
+        });
+        
         return result;
     }
 }

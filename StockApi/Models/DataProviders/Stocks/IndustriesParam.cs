@@ -2,14 +2,9 @@
 
 namespace StockApi.Models.DataProviders.Stocks;
 
-public struct IndustriesParam : IKey
+public struct IndustriesParam(IKey req) : IKey
 {
-    private string BaseKey { get; set; }
-
-    public IndustriesParam(IndustriesRequest req)
-    {
-        BaseKey = req.KeyWithPrefix();
-    }
+    private string BaseKey { get; set; } = req.KeyWithPrefix();
 
     public string KeyWithPrefix()
     {
