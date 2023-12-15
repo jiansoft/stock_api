@@ -1,12 +1,12 @@
 ﻿namespace StockApi.Models.HttpTransactions.Stock.Industry;
 
-public class IndustriesResponse<T> : IResponse
+public class IndustriesResponse(IEnumerable<IndustryDto> data): IResponse
 {
     public int Code { get; set; }
-    public Payload<T> Payload { get; set; }
+    public Payload<IEnumerable<IndustryDto>> Payload { get; set; } = new(data);
 
     public string KeyWithPrefix()
     {
-        return $"{nameof(IndustriesResponse<T>)}";
+        return $"{nameof(IndustriesResponse)}";
     }
 }

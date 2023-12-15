@@ -4,10 +4,18 @@ namespace StockApi.Models.HttpTransactions
 {
     public class GeneralResponse<T> : IResponse
     {
+        /// <summary>
+        /// 訊息碼-暫無用處
+        /// </summary>
         public int Code { get; set; }
 
-        public Meta? Meta { get; set; }
-        
+        /// <summary>
+        /// 分頁相關資料
+        /// </summary>
+        public Meta Meta { get; set; }
+        /// <summary>
+        /// 回應的主體內容數據
+        /// </summary>
         public Payload<T> Payload { get; set; }
         
         public string KeyWithPrefix()

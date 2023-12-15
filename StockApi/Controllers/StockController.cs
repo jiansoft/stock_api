@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockApi.Models.Defines;
-using StockApi.Models.Exceptions;
-using StockApi.Models.HttpTransactions;
+using StockApi.Models.HttpTransactions.Services;
 using StockApi.Models.HttpTransactions.Stock.Details;
 using StockApi.Models.HttpTransactions.Stock.Dividend;
 using StockApi.Models.HttpTransactions.Stock.Industry;
-using StockApi.Models.Services;
+using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 
 namespace StockApi.Controllers;
 
@@ -21,7 +20,7 @@ public class StockController(StockService ss) : ControllerBase
     /// <returns>股票基本資料</returns>
     [HttpGet]
     [Route("details")]
-    public ActionResult<DetailsResponse<IEnumerable<DetailDto>>> Details(int? pageIndex, int? pageSize)
+    public DetailsResponse Details(int? pageIndex, int? pageSize)
     {
         var request = new DetailsRequest
         {
@@ -42,20 +41,44 @@ public class StockController(StockService ss) : ControllerBase
     /// <returns>股票產業分類</returns>
     [HttpGet]
     [Route("industry")]
-    public ActionResult<IndustriesResponse<IEnumerable<IndustryDto>>> Industries()
+    public IndustriesResponse Industries()
     {
         return ss.GetIndustriesResponse(new IndustriesRequest());
     }
-    
+
     /// <summary>
     /// 取得股票產業分類
     /// </summary>
     /// <returns>股票產業分類</returns>
     [HttpGet]
-    [Route("dividend")]
-    public ActionResult<DividendResponse<IEnumerable<DividendDto>>> Dividend(string stockSymbol)
+    [Route("dividend/{stockSymbol}")]
+    public DividendResponse Dividend(string stockSymbol)
     {
         var request = new DividendRequest(stockSymbol);
+        
         return ss.GetDividendResponse(request);
+    }
+
+    /// <summary>
+    /// 取得最後收盤時的股價
+    /// </summary>
+    /// <param name="pageIndex"></param>
+    /// <param name="pageSize"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("last_daily_quote")]
+    public LastDailyQuoteResponse LastDailyQuote(int? pageIndex, int? pageSize)
+    {
+        var request = new LastDailyQuoteRequest
+        {
+            PageIndex = pageIndex is null or <= 0
+                ? Constants.DefaultPageIndex
+                : pageIndex.Value,
+            PageSize = pageSize is null or <= 0 or > Constants.MaximumPageSize
+                ? Constants.DefaultPageSize
+                : pageSize.Value
+        };
+
+        return ss.GetLastDailyQuoteResponse(request);
     }
 }

@@ -28,7 +28,7 @@ public class DividendEntity
     public string StockSymbol { get; set; } = string.Empty;
 
     /// <summary>
-    /// 季度 空字串:全年度 Q1~Q4:第一季~第四季 H1~H2︰上半季~下半季
+    /// 股利所屬季度 空字串:全年度 Q1~Q4:第一季~第四季 H1~H2︰上半季~下半季
     /// </summary>
     public string Quarter { get; set; } = string.Empty;
 

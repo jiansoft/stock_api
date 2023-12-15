@@ -1,8 +1,10 @@
 ﻿using jIAnSoft.Brook.Mapper;
+using StockApi.Models.DataProviders.Config;
 using StockApi.Models.DataProviders.Stocks;
 using StockApi.Models.Entities;
 using StockApi.Models.HttpTransactions;
 using System.Data;
+using System.Text;
 
 namespace StockApi.Models.DataProviders;
 
@@ -30,7 +32,6 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                 return new StocksResult(meta, []);
             }
 
-
             var result = new StocksResult(meta, db.Query<StockEntity>(
                 """
                 select
@@ -47,11 +48,11 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                  from
                     stocks
                  where
-                    stock_exchange_market_id in (2,5)
+                    stock_exchange_market_id in (2, 4, 5)
                  order by
                      stock_exchange_market_id,
                      stock_industry_id, stock_symbol
-                offset @pi limit @ps
+                 offset @pi limit @ps
                 """, new[]
                 {
                     db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
@@ -119,7 +120,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                         dq."SecurityCode" = d.security_code
                 		AND d."ex-dividend_date1" != '-' AND d."ex-dividend_date1" != '尚未公布'
                         AND dq."Date" < TO_DATE(d."ex-dividend_date1", 'YYYY-MM-DD')
-                    order by 
+                    order by
                         "Date" desc
                     limit 1
                 ) dq ON TRUE
@@ -127,10 +128,109 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                 order by d.year desc, year_of_dividend desc, d.quarter desc
                 """, new[]
                 {
-                    db.Parameter("@security_code", param.StockSymbol, DbType.String)
+                    db.Parameter("@security_code", param.StockSymbol)
                 }));
         });
-        
+
+        return result;
+    }
+
+    public LastDailyQuoteResult GetLastDailyQuote(LastDailyQuoteParam param)
+    {
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
+        {
+            const string table = "stock_exchange_market as sem";
+            const string join = """
+                                inner join stocks as s on s.stock_exchange_market_id = sem.stock_exchange_market_id
+                                inner join last_daily_quotes as ldq on s.stock_symbol = ldq.security_code
+                                """;
+            const string where = "s.\"SuspendListing\" = false";
+
+            using var db = Brook.Load("stock");
+
+            var recordCount = GetOne(db, table, where, join);
+            var meta = new Meta(recordCount, param.PageIndex, param.PageSize);
+
+            if (recordCount == 0)
+            {
+                return new LastDailyQuoteResult(meta, []);
+            }
+
+            var sb = new StringBuilder();
+            sb.Append(
+                """
+                select
+                    sem.stock_exchange_market_id as "StockExchangeMarketId",
+                    s.stock_symbol as "StockSymbol",
+                    trading_volume as "TradingVolume",
+                    "transaction" as "Transaction",
+                    trade_value as "TradeValue",
+                    opening_price as "OpeningPrice",
+                    highest_price as "HighestPrice",
+                    lowest_price as "LowestPrice",
+                    closing_price as "ClosingPrice",
+                    change_range as "ChangeRange",
+                    change as "Change",
+                    moving_average_5 as "MovingAverage5",
+                    moving_average_10 as "MovingAverage10",
+                    moving_average_20 as "MovingAverage20",
+                    moving_average_60 as "MovingAverage60",
+                    moving_average_120 as "MovingAverage120",
+                    moving_average_240 as "MovingAverage240",
+                    maximum_price_in_year as "MaximumPriceInYear",
+                    minimum_price_in_year as "MinimumPriceInYear",
+                    average_price_in_year as "AveragePriceInYear",
+                    maximum_price_in_year_date_on as "MaximumPriceInYearDateOn",
+                    minimum_price_in_year_date_on as "MinimumPriceInYearDateOn",
+                    "price-to-book_ratio" as "PriceToBookRatio"
+                from stock_exchange_market as sem
+                inner join stocks as s on s.stock_exchange_market_id = sem.stock_exchange_market_id
+                inner join last_daily_quotes as ldq on s.stock_symbol = ldq.security_code
+                where s."SuspendListing" = false
+                order by s.stock_symbol
+                offset @pi limit @ps;
+                """);
+
+
+            return new LastDailyQuoteResult(meta, db.Query<LastDailyQuoteEntity>(
+                sb.ToString(), new[]
+                {
+                    db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
+                    db.Parameter("@ps", param.PageSize, DbType.Int64)
+                }));
+        });
+
+        return result;
+    }
+
+    public ConfigResult GetConfig(ConfigParam param)
+    {
+        var now = DateTime.Now;
+        var next3Pm = new DateTime(now.Year, now.Month, now.Day, 15, 0, 0);
+        if (now > next3Pm)
+        {
+            next3Pm = next3Pm.AddDays(1);
+        }
+
+        var timeDifference = next3Pm - now;
+
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(timeDifference), () =>
+        {
+            using var db = Brook.Load("stock");
+
+            return new ConfigResult(db.First<ConfigEntity>(
+                """
+                select
+                    key as "Key", val as "Val"
+                from
+                    config
+                where key = @key;
+                """, new[]
+                {
+                    db.Parameter("@key", param.Key)
+                }));
+        });
+
         return result;
     }
 }

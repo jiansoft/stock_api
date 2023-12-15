@@ -4,9 +4,9 @@ namespace StockApi.Models.DataProviders;
 
 public abstract class DbDataProvider : IDataProvider
 {
-    protected long GetOne(SqlMapper db, string table, string where)
+    protected long GetOne(SqlMapper db, string table, string where, string join = "")
     {
-        var sqlCount = $"SELECT COUNT(*) AS TotalCount FROM {table} where {where}";
+        var sqlCount = $"SELECT COUNT(*) AS TotalCount FROM {table} {join} where {where}";
         var one = db.One<long>(sqlCount);
         
         return one;

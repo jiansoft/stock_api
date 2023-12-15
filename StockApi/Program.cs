@@ -5,7 +5,7 @@ using NLog.Web;
 using StockApi.Middlewares;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
-using StockApi.Models.Services;
+using StockApi.Models.HttpTransactions.Services;
 
 namespace StockApi
 {

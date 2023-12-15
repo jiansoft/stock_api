@@ -2,7 +2,7 @@
 
 public class DividendRequest(string stockSymbol) : IRequest
 {
-    public string StockSymbol { get; set; } = stockSymbol;
+    public string StockSymbol { get; } = stockSymbol;
     
     public string KeyWithPrefix()
     {

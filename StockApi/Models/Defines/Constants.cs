@@ -1,5 +1,5 @@
 ﻿namespace StockApi.Models.Defines;
-public class Constants
+public abstract class Constants
 {
     /// <summary>
     /// 0
@@ -19,4 +19,6 @@ public class Constants
     /// 每頁最多1000筆
     /// </summary>
     public const int MaximumPageSize = 1000;
+
+    public const string KeyLastClosingKay = "last-closing-day";
 }
