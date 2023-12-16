@@ -1,13 +1,13 @@
-﻿using StockApi.Models.DataProviders;
-using StockApi.Models.DataProviders.Config;
-using StockApi.Models.DataProviders.Stocks;
-using StockApi.Models.Defines;
-using StockApi.Models.HttpTransactions.Stock.Details;
-using StockApi.Models.HttpTransactions.Stock.Dividend;
-using StockApi.Models.HttpTransactions.Stock.Industry;
-using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
+﻿namespace StockApi.Models.HttpTransactions.Services;
 
-namespace StockApi.Models.HttpTransactions.Services;
+using DataProviders;
+using DataProviders.Config;
+using DataProviders.Stocks;
+using Defines;
+using Stock.Details;
+using Stock.Dividend;
+using Stock.Industry;
+using Stock.LastDailyQuote;
 
 public class StockService(StocksDataProvider sp, CacheDataProvider cp)
 {
@@ -73,29 +73,20 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
 
     public LastDailyQuoteResponse GetLastDailyQuoteResponse(LastDailyQuoteRequest request)
     {
-        var now = DateTime.Now;
-        var next3Pm = new DateTime(now.Year, now.Month, now.Day, 15, 0, 0);
-        // 如果當前時間已經超過當天的下午3點，則使用明天的下午3點
-        if (now > next3Pm)
-        {
-            next3Pm = next3Pm.AddDays(1);
-        }
-
-        var timeDifference = next3Pm - now;
-
-        return cp.GetOrSet(request.KeyWithPrefix(), CacheDataProvider.NewOption(timeDifference), () =>
-        {
-            var paramLastDailyQuote = new LastDailyQuoteParam(request);
-            var resultDailyQuote = sp.GetLastDailyQuote(paramLastDailyQuote);
-            var paramConfig = new ConfigParam(Constants.KeyLastClosingKay);
-            var resultConfig = sp.GetConfig(paramConfig);
-            var data = resultDailyQuote.Entities.Select(s => new LastDailyQuoteDto(s));
-            var payload = new LastDailyQuotePayload(resultConfig.Entity.Val, data);
-
-            return new LastDailyQuoteResponse(resultDailyQuote.Meta, payload)
+        return cp.GetOrSet(request.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            () =>
             {
-                Code = StatusCodes.Status200OK
-            };
-        });
+                var paramLastDailyQuote = new LastDailyQuoteParam(request);
+                var resultDailyQuote = sp.GetLastDailyQuote(paramLastDailyQuote);
+                var paramConfig = new ConfigParam(Constants.KeyLastClosingKay);
+                var resultConfig = sp.GetConfig(paramConfig);
+                var data = resultDailyQuote.Result.Select(s => new LastDailyQuoteDto(s));
+                var payload = new LastDailyQuotePayload(resultConfig.Entity.Val, data);
+
+                return new LastDailyQuoteResponse(resultDailyQuote.Meta, payload)
+                {
+                    Code = StatusCodes.Status200OK
+                };
+            });
     }
 }

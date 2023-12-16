@@ -1,12 +1,13 @@
 ﻿using jIAnSoft.Brook.Mapper;
-using StockApi.Models.DataProviders.Config;
-using StockApi.Models.DataProviders.Stocks;
-using StockApi.Models.Entities;
-using StockApi.Models.HttpTransactions;
 using System.Data;
 using System.Text;
 
 namespace StockApi.Models.DataProviders;
+
+using Config;
+using Stocks;
+using Entities;
+using HttpTransactions;
 
 public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 {
@@ -135,7 +136,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public LastDailyQuoteResult GetLastDailyQuote(LastDailyQuoteParam param)
+    public LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>> GetLastDailyQuote(LastDailyQuoteParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
         {
@@ -153,7 +154,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
             if (recordCount == 0)
             {
-                return new LastDailyQuoteResult(meta, []);
+                return new LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>>(meta, []);
             }
 
             var sb = new StringBuilder();
@@ -192,7 +193,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                 """);
 
 
-            return new LastDailyQuoteResult(meta, db.Query<LastDailyQuoteEntity>(
+            return new LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>>(meta, db.Query<LastDailyQuoteEntity>(
                 sb.ToString(), new[]
                 {
                     db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
@@ -205,31 +206,23 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
     public ConfigResult GetConfig(ConfigParam param)
     {
-        var now = DateTime.Now;
-        var next3Pm = new DateTime(now.Year, now.Month, now.Day, 15, 0, 0);
-        if (now > next3Pm)
-        {
-            next3Pm = next3Pm.AddDays(1);
-        }
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            () =>
+            {
+                using var db = Brook.Load("stock");
 
-        var timeDifference = next3Pm - now;
-
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(timeDifference), () =>
-        {
-            using var db = Brook.Load("stock");
-
-            return new ConfigResult(db.First<ConfigEntity>(
-                """
-                select
-                    key as "Key", val as "Val"
-                from
-                    config
-                where key = @key;
-                """, new[]
-                {
-                    db.Parameter("@key", param.Key)
-                }));
-        });
+                return new ConfigResult(db.First<ConfigEntity>(
+                    """
+                    select
+                        key as "Key", val as "Val"
+                    from
+                        config
+                    where key = @key;
+                    """, new[]
+                    {
+                        db.Parameter("@key", param.Key)
+                    }));
+            });
 
         return result;
     }

@@ -2,5 +2,5 @@
 
 public interface IDataResult<T>
 {
-    public IEnumerable<T> Entities { get; set; }
+    public T Result { get; set; }
 }

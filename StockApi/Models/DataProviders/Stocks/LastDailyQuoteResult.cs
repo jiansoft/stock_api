@@ -3,8 +3,9 @@ using StockApi.Models.HttpTransactions;
 
 namespace StockApi.Models.DataProviders.Stocks;
 
-public class LastDailyQuoteResult(Meta meta, IEnumerable<LastDailyQuoteEntity> entities) : IDataResult<LastDailyQuoteEntity>
+public class LastDailyQuoteResult<T>(Meta meta, T entities) : IDataResult<T>
 {
     public Meta Meta { get; set; } = meta;
-    public IEnumerable<LastDailyQuoteEntity> Entities { get; set; } = entities;
+
+    public T Result { get; set; } = entities;
 }
