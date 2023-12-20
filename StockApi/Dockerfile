@@ -23,4 +23,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+VOLUME ["/app/logs"]
+RUN ln -snf /usr/share/zoneinfo/Asia/Taipei /etc/localtime && echo Asia/Taipei > /etc/timezone
+
 ENTRYPOINT ["dotnet", "StockApi.dll"]
