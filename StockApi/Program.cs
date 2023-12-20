@@ -32,6 +32,7 @@ namespace StockApi
             
             builder.Services.AddSingleton<CacheDataProvider>();
             builder.Services.AddSingleton<StocksDataProvider>();
+            
             builder.Services.AddSingleton<StockService>();
             
             builder.Services.AddMemoryCache();
@@ -65,11 +66,10 @@ namespace StockApi
             app.UseAuthorization();
 
             app.MapRazorPages();
-
+            
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-
             app.Run();
         }
     }

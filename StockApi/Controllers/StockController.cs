@@ -94,15 +94,10 @@ public class StockController(StockService ss) : ControllerBase
     [HttpGet]
     [Route("historical_daily_quote/{date}")]
     public ActionResult<IResponse<IPagingPayload<HistoricalDailyQuoteDto>>> HistoricalDailyQuote(
-        string date,
+        DateOnly date,
         int? pageIndex,
         int? pageSize)
     {
-        if (!DateOnly.TryParse(date, out var dateOnly))
-        {
-            return BadRequest(new { message = "日期格式錯誤 (yyyy-MM-dd)" });
-        }
-
         var request = new HistoricalDailyQuoteRequest
         {
             PageIndex = pageIndex is null or <= 0
@@ -111,7 +106,7 @@ public class StockController(StockService ss) : ControllerBase
             PageSize = pageSize is null or <= 0 or > Constants.MaximumPageSize
                 ? Constants.DefaultPageSize
                 : pageSize.Value,
-            Date = dateOnly
+            Date = date
         };
 
         return Ok(ss.GetHistoricalDailyQuoteResponse(request));

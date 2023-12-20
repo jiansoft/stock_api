@@ -238,7 +238,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                                 inner join stocks as s on s.stock_exchange_market_id = sem.stock_exchange_market_id
                                 inner join "DailyQuotes" as dq on s.stock_symbol = dq."SecurityCode"
                                 """;
-             var where = $"""dq."Date" = '{param.Date}' and s."SuspendListing" = false""";
+             var where = $"""dq."Date" = '{param.Date.ToString("yyyy-MM-dd")}' and s."SuspendListing" = false""";
 
             using var db = Brook.Load("stock");
 
