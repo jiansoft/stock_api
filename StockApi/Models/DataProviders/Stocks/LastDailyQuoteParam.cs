@@ -2,21 +2,14 @@
 
 namespace StockApi.Models.DataProviders.Stocks;
 
-public struct LastDailyQuoteParam : IKey
+public struct LastDailyQuoteParam(LastDailyQuoteRequest req) : IKey
 {
-    private string BaseKey { get; set; }
-    public long PageIndex { get; set; }
-    public long PageSize { get; set; }
-
-    public LastDailyQuoteParam(LastDailyQuoteRequest req)
-    {
-        BaseKey = req.KeyWithPrefix();
-        PageIndex = req.PageIndex;
-        PageSize = req.PageSize;
-    }
+    private string BaseKey { get; set; } = req.KeyWithPrefix();
+    public long PageIndex { get; set; } = req.PageIndex;
+    public long PageSize { get; set; } = req.PageSize;
 
     public string KeyWithPrefix()
     {
-        return $"{BaseKey}:{nameof(LastDailyQuoteParam)}";
+        return $"{BaseKey}:{nameof(LastDailyQuoteParam)}:{PageIndex}-{PageSize}";
     }
 }

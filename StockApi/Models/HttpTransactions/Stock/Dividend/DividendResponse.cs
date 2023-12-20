@@ -1,12 +1,18 @@
 ﻿namespace StockApi.Models.HttpTransactions.Stock.Dividend;
 
-public class DividendResponse(IEnumerable<DividendDto> data) : IResponse
+public class DividendPayload<T>(T data) : IPayload<T>
 {
-    public int Code { get; set; }
-    public Payload<IEnumerable<DividendDto>> Payload { get; set; } = new(data);
+    public T Data { get; set; } = data;
+}
 
+public class DividendResponse<T>(T data) : IResponse<T>
+{
     public string KeyWithPrefix()
     {
-        return $"{nameof(DividendResponse)}";
+        return $"{nameof(DividendResponse<T>)}";
     }
+    
+    public int Code { get; set; }
+    
+    public T Payload { get; set; } = data;
 }

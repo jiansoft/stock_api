@@ -1,4 +1,6 @@
-﻿namespace StockApi.Models.HttpTransactions.Services;
+﻿using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+
+namespace StockApi.Models.HttpTransactions.Services;
 
 using DataProviders;
 using DataProviders.Config;
@@ -14,79 +16,116 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
     /// <summary>
     /// Retrieves stock details response.
     /// </summary>
-    /// <param name="request">The request object containing the necessary information to retrieve stock details.</param>
+    /// <param name="req">The request object containing the necessary information to retrieve stock details.</param>
     /// <returns>A response object containing a list of stock information.</returns>
-    public DetailsResponse GetDetailsResponse(DetailsRequest request)
+    public IResponse<IPagingPayload<DetailDto>> GetDetailsResponse(DetailsRequest req)
     {
-        return cp.GetOrSet(request.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
+        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
         {
-            var param = new StocksParam(request);
+            var param = new StocksParam(req);
             var result = sp.GetStocks(param);
             var data = result.Entities.Select(s => new DetailDto(s));
-
-            return new DetailsResponse(result.Meta, data)
+            var payload = new DetailsPayload<DetailDto>(result.Meta, data);
+            var response = new DetailsResponse<IPagingPayload<DetailDto>>(payload)
             {
                 Code = StatusCodes.Status200OK,
             };
+
+            return response;
         });
     }
 
     /// <summary>
     /// 股票產業分類
     /// </summary>
-    /// <param name="request">查詢參數</param>
+    /// <param name="req">查詢參數</param>
     /// <returns>股票產業分類</returns>
-    public IndustriesResponse GetIndustriesResponse(IndustriesRequest request)
+    public IResponse<IPayload<IEnumerable<IndustryDto>>> GetIndustriesResponse(IndustriesRequest req)
     {
-        return cp.GetOrSet(request.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)), () =>
+        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)), () =>
         {
-            var param = new IndustriesParam(request);
+            var param = new IndustriesParam(req);
             var result = sp.GetIndustries(param);
             var data = result.Entities.Select(s => new IndustryDto(s));
-
-            return new IndustriesResponse(data)
+            var payload = new IndustriesPayload<IEnumerable<IndustryDto>>(data);
+            var response = new IndustriesResponse<IPayload<IEnumerable<IndustryDto>>>(payload)
             {
                 Code = StatusCodes.Status200OK
             };
+
+            return response;
         });
     }
 
     /// <summary>
     /// 股票歷年發放股利
     /// </summary>
-    /// <param name="request">查詢參數</param>
+    /// <param name="req">查詢參數</param>
     /// <returns>股票歷年發放股利</returns>
-    public DividendResponse GetDividendResponse(DividendRequest request)
+    public IResponse<IPayload<IEnumerable<DividendDto>>> GetDividendResponse(DividendRequest req)
     {
-        return cp.GetOrSet(request.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
+        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
         {
-            var param = new DividendParam(request);
+            var param = new DividendParam(req);
             var result = sp.GetDividend(param);
             var data = result.Entities.Select(s => new DividendDto(s));
-
-            return new DividendResponse(data)
+            var payload = new DividendPayload<IEnumerable<DividendDto>>(data);
+            var response = new DividendResponse<IPayload<IEnumerable<DividendDto>>>(payload)
             {
                 Code = StatusCodes.Status200OK
             };
+
+            return response;
         });
     }
 
-    public LastDailyQuoteResponse GetLastDailyQuoteResponse(LastDailyQuoteRequest request)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="req">查詢參數</param>
+    /// <returns></returns>
+    public IResponse<IPagingPayload<LastDailyQuoteDto>> GetLastDailyQuoteResponse(LastDailyQuoteRequest req)
     {
-        return cp.GetOrSet(request.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
-                var paramLastDailyQuote = new LastDailyQuoteParam(request);
-                var resultDailyQuote = sp.GetLastDailyQuote(paramLastDailyQuote);
+                var paramLastDailyQuote = new LastDailyQuoteParam(req);
+                var quotes = sp.GetLastDailyQuote(paramLastDailyQuote);
                 var paramConfig = new ConfigParam(Constants.KeyLastClosingKay);
-                var resultConfig = sp.GetConfig(paramConfig);
-                var data = resultDailyQuote.Result.Select(s => new LastDailyQuoteDto(s));
-                var payload = new LastDailyQuotePayload(resultConfig.Entity.Val, data);
-
-                return new LastDailyQuoteResponse(resultDailyQuote.Meta, payload)
+                var config = sp.GetConfig(paramConfig);
+                var data = quotes.Result.Select(s => new LastDailyQuoteDto(s));
+                var payload = new LastDailyQuotePayload<LastDailyQuoteDto>(config.Entity.Val, quotes.Meta, data);
+                var response = new LastDailyQuoteResponse<IPagingPayload<LastDailyQuoteDto>>(payload)
                 {
                     Code = StatusCodes.Status200OK
                 };
+
+                return response;
+            });
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="req">查詢參數</param>
+    /// <returns></returns>
+    public IResponse<IPagingPayload<HistoricalDailyQuoteDto>> GetHistoricalDailyQuoteResponse(
+        HistoricalDailyQuoteRequest req)
+    {
+        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            () =>
+            {
+                var param = new HistoricalDailyQuoteParam(req);
+                var quotes = sp.GetHistoricalDailyQuote(param);
+                var data = quotes.Result.Select(s => new HistoricalDailyQuoteDto(s));
+                var payload = new HistoricalDailyQuotePayload<HistoricalDailyQuoteDto>(quotes.Meta, data);
+                var response =
+                    new HistoricalDailyQuoteResponse<IPagingPayload<HistoricalDailyQuoteDto>>(payload)
+                    {
+                        Code = StatusCodes.Status200OK
+                    };
+
+                return response;
             });
     }
 }

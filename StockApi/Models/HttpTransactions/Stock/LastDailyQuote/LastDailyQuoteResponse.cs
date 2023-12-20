@@ -1,26 +1,21 @@
-﻿using StockApi.Models.Entities;
-
+﻿
 namespace StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 
-public struct LastDailyQuotePayload(string date, IEnumerable<LastDailyQuoteDto> data)
+public struct LastDailyQuotePayload<T>(string date, Meta meta, IEnumerable<T> data) : IPagingPayload<T>
 {
     public string Date { get; set; } = date;
-    
-    public IEnumerable<LastDailyQuoteDto> Data { get; set; } = data;
+    public Meta Meta { get; set; } = meta;
+    public IEnumerable<T> Data { get; set; } = data;
 }
 
-public class LastDailyQuoteResponse(Meta meta, LastDailyQuotePayload payload) : IResponse
+public class LastDailyQuoteResponse<T>(T payload) : IResponse<T>
 {
-    /// <summary>
-    /// 分頁相關資料
-    /// </summary>
-    public Meta Meta { get; set; } = meta;
-    
-    public Payload<LastDailyQuotePayload> Payload { get; set; } = new(payload);
     public string KeyWithPrefix()
     {
-        return $"{nameof(LastDailyQuoteResponse)}";
+        return $"{nameof(LastDailyQuoteResponse<T>)}";
     }
 
     public int Code { get; set; }
+
+    public T Payload { get; set; } = payload;
 }

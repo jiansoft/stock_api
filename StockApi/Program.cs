@@ -30,17 +30,16 @@ namespace StockApi
                 opt.UseInMemoryDatabase("TodoList"));
             builder.Services.Configure<AttachmentOptions>(builder.Configuration.GetSection("Attachment"));
             
-            builder.Services.AddScoped<StocksDataProvider>();
-            builder.Services.AddScoped<CacheDataProvider>();
-            
-            builder.Services.AddScoped<StockService>();
+            builder.Services.AddSingleton<CacheDataProvider>();
+            builder.Services.AddSingleton<StocksDataProvider>();
+            builder.Services.AddSingleton<StockService>();
             
             builder.Services.AddMemoryCache();
 
             var app = builder.Build();
-            
+
             app.UseMiddleware<ExceptionMiddleware>();
-            
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto

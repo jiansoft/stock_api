@@ -2,7 +2,7 @@
 
 namespace StockApi.Models.DataProviders.Stocks;
 
-public class LastDailyQuoteResult<T>(Meta meta, T entities) : IDataResult<T>
+public class HistoricalDailyQuoteResult<T>(Meta meta, T entities) : IDataResult<T>
 {
     public Meta Meta { get; set; } = meta;
 

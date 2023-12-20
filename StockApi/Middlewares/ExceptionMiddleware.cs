@@ -49,8 +49,8 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         context.Response.ContentType = ContentType;
         context.Response.StatusCode = ErrorResponseStatusCode;
 
-        var res = new ErrorResponse
-            { Code = context.Response.StatusCode, Message = message };
+        var res = new ErrorResponse<string>(message)
+            { Code = context.Response.StatusCode };
         var json = JsonConvert.SerializeObject(res);
 
         return context.Response.WriteAsync(json);

@@ -11,7 +11,7 @@ public class CacheDataProvider(IMemoryCache cache) : IDataProvider
         return new MemoryCacheEntryOptions().SetAbsoluteExpiration(relative);
     }
 
-    public T GetOrSet<T>(string key, MemoryCacheEntryOptions option, Func<T> func)
+    public T GetOrSet<T>(string key, MemoryCacheEntryOptions option, Func<T> factory)
     {
         if (Get<T>(key) is { } cachedValue)
         {
@@ -26,13 +26,16 @@ public class CacheDataProvider(IMemoryCache cache) : IDataProvider
             {
                 return doubleCheckedCachedValue;
             }
-
-            var tempValue = func.Invoke();
-
-            Set(key, tempValue, option);
-
-            return tempValue;
         }
+
+        var tempValue = factory.Invoke();
+
+        lock (lockObject)
+        {
+            Set(key, tempValue, option);
+        }
+
+        return tempValue;
     }
 
     private void Set<T>(string key, T val, MemoryCacheEntryOptions option)
@@ -68,11 +71,11 @@ public class CacheDataProvider(IMemoryCache cache) : IDataProvider
 
             var newLockObject = new object();
 
+
             Set(lockKey, newLockObject, new MemoryCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromMinutes(10)
             });
-
             return newLockObject;
         }
     }

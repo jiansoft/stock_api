@@ -9,6 +9,6 @@ public readonly struct DividendParam(DividendRequest req) : IKey
 
     public string KeyWithPrefix()
     {
-        return $"{BaseKey}:{nameof(IndustriesParam)}";
+        return $"{BaseKey}:{nameof(IndustriesParam)}:{StockSymbol}";
     }
 }

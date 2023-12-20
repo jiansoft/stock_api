@@ -1,4 +1,5 @@
 ﻿using jIAnSoft.Brook.Mapper;
+using StockApi.Models.Entities;
 using System.Data;
 using System.Text;
 
@@ -6,7 +7,6 @@ namespace StockApi.Models.DataProviders;
 
 using Config;
 using Stocks;
-using Entities;
 using HttpTransactions;
 
 public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
@@ -223,6 +223,77 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                         db.Parameter("@key", param.Key)
                     }));
             });
+
+        return result;
+    }
+    
+    //HistoricalDailyQuote
+    
+    public HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>> GetHistoricalDailyQuote(HistoricalDailyQuoteParam param)
+    {
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
+        {
+            const string table = "stock_exchange_market as sem";
+            const string join = """
+                                inner join stocks as s on s.stock_exchange_market_id = sem.stock_exchange_market_id
+                                inner join "DailyQuotes" as dq on s.stock_symbol = dq."SecurityCode"
+                                """;
+             var where = $"""dq."Date" = '{param.Date}' and s."SuspendListing" = false""";
+
+            using var db = Brook.Load("stock");
+
+            var recordCount = GetOne(db, table, where, join);
+            var meta = new Meta(recordCount, param.PageIndex, param.PageSize);
+
+            if (recordCount == 0)
+            {
+                return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, []);
+            }
+
+            var sb = new StringBuilder();
+            sb.Append(
+                $"""
+                 select
+                    sem.stock_exchange_market_id as "StockExchangeMarketId",
+                    s.stock_symbol as "StockSymbol",
+                    "TradingVolume",
+                    "Transaction",
+                    "TradeValue",
+                    "OpeningPrice",
+                    "HighestPrice",
+                    "LowestPrice",
+                    "ClosingPrice",
+                    "ChangeRange",
+                    "Change",
+                    "MovingAverage5",
+                    "MovingAverage10",
+                    "MovingAverage20",
+                    "MovingAverage60",
+                    "MovingAverage120",
+                    "MovingAverage240",
+                    maximum_price_in_year as "MaximumPriceInYear",
+                    minimum_price_in_year as "MinimumPriceInYear",
+                    average_price_in_year as "AveragePriceInYear",
+                    maximum_price_in_year_date_on as "MaximumPriceInYearDateOn",
+                    minimum_price_in_year_date_on as "MinimumPriceInYearDateOn",
+                    "price-to-book_ratio" as "PriceToBookRatio"
+                 from stock_exchange_market as sem
+                 inner join stocks as s on s.stock_exchange_market_id = sem.stock_exchange_market_id
+                 inner join "DailyQuotes" as dq on s.stock_symbol = dq."SecurityCode"
+                 where dq."Date" = @date and s."SuspendListing" = false
+                 order by s.stock_symbol
+                 offset @pi limit @ps;
+                 """);
+
+
+            return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, db.Query<HistoricalDailyQuoteEntity>(
+                sb.ToString(), new[]
+                {
+                    db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
+                    db.Parameter("@ps", param.PageSize, DbType.Int64),
+                    db.Parameter("@date", param.Date, DbType.Date)
+                }));
+        });
 
         return result;
     }
