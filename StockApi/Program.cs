@@ -9,7 +9,7 @@ using StockApi.Models.HttpTransactions.Services;
 
 namespace StockApi
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -34,6 +34,7 @@ namespace StockApi
             builder.Services.AddSingleton<StocksDataProvider>();
             
             builder.Services.AddSingleton<StockService>();
+            builder.Services.AddSingleton<TwseService>();
             
             builder.Services.AddMemoryCache();
 
@@ -54,7 +55,7 @@ namespace StockApi
                 app.UseHsts();
 
             }
-
+            
             app.UseSwagger();
             app.UseSwaggerUI();
 

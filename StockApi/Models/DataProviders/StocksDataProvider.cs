@@ -1,13 +1,13 @@
 ﻿using jIAnSoft.Brook.Mapper;
+using StockApi.Models.DataProviders.Index;
 using StockApi.Models.Entities;
 using System.Data;
 using System.Text;
+using StockApi.Models.DataProviders.Config;
+using StockApi.Models.DataProviders.Stocks;
+using StockApi.Models.HttpTransactions;
 
 namespace StockApi.Models.DataProviders;
-
-using Config;
-using Stocks;
-using HttpTransactions;
 
 public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 {
@@ -287,13 +287,56 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
 
             return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, db.Query<HistoricalDailyQuoteEntity>(
-                sb.ToString(), new[]
-                {
+                sb.ToString(), [
                     db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
                     db.Parameter("@ps", param.PageSize, DbType.Int64),
                     db.Parameter("@date", param.Date, DbType.Date)
-                }));
+                ]));
         });
+
+        return result;
+    }
+
+    public IndexResult GetIndex(IndexParam param)
+    {
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            () =>
+            {
+                const string table = "index";
+                var where = $"category  = '{param.Category}'";
+
+                using var db = Brook.Load("stock");
+
+                var recordCount = GetOne(db, table, where);
+                var meta = new Meta(recordCount, param.PageIndex, param.PageSize);
+
+                if (recordCount == 0)
+                {
+                    return new IndexResult(meta, []);
+                }
+
+
+                return new IndexResult(meta, db.Query<IndexEntity>(
+                    """
+                    select
+                        category as "Category",
+                        date as "Date",
+                        trading_volume as "TradingVolume",
+                        transaction as "Transaction",
+                        trade_value as "TradeValue",
+                        change as "Change",
+                        index as "Index"
+                    from
+                        index
+                    where category = @category
+                    order by date desc
+                    offset @pi limit @ps;
+                    """, [
+                        db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
+                        db.Parameter("@ps", param.PageSize, DbType.Int64),
+                        db.Parameter("@category", param.Category)
+                    ]));
+            });
 
         return result;
     }
