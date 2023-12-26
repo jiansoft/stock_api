@@ -7,6 +7,7 @@ using StockApi.Models.HttpTransactions.Stock.Dividend;
 using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Industry;
 using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.Revenue;
 
 namespace StockApi.Controllers;
 
@@ -110,5 +111,62 @@ public class StockController(StockService ss) : ControllerBase
         };
 
         return Ok(ss.GetHistoricalDailyQuoteResponse(request));
+    }
+
+    /// <summary>
+    /// 取得歷史的收盤股價
+    /// </summary>
+    /// <param name="monthOfYear">日期，格式︰yyyyMM</param>
+    /// <param name="stockSymbol">股票代號</param>
+    /// <param name="pageIndex">取得第幾頁的數據</param>
+    /// <param name="pageSize">每頁幾筆數據</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("revenue_on/{monthOfYear:long}")]
+    public ActionResult<IResponse<IPagingPayload<RevenueDto>>> Revenue(
+        long monthOfYear,
+        int? pageIndex,
+        int? pageSize)
+    {
+        var request = new RevenueRequest
+        {
+            PageIndex = pageIndex is null or <= 0
+                ? Constants.DefaultPageIndex
+                : pageIndex.Value,
+            PageSize = pageSize is null or <= 0 or > Constants.MaximumPageSize
+                ? Constants.DefaultPageSize
+                : pageSize.Value,
+            MonthOfYear = monthOfYear,
+        };
+
+        return Ok(ss.GetRevenueResponse(request));
+    }
+
+    /// <summary>
+    /// 取得歷史的收盤股價
+    /// </summary>
+    /// <param name="stockSymbol">指定股票</param>
+    /// <param name="pageIndex">取得第幾頁的數據</param>
+    /// <param name="pageSize">每頁幾筆數據</param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("revenue_by/{stockSymbol}")]
+    public ActionResult<IResponse<IPagingPayload<RevenueDto>>> Revenue(
+        string stockSymbol,
+        int? pageIndex,
+        int? pageSize)
+    {
+        var request = new RevenueRequest
+        {
+            PageIndex = pageIndex is null or <= 0
+                ? Constants.DefaultPageIndex
+                : pageIndex.Value,
+            PageSize = pageSize is null or <= 0 or > Constants.MaximumPageSize
+                ? Constants.DefaultPageSize
+                : pageSize.Value,
+            StockSymbol = string.IsNullOrEmpty(stockSymbol) ? string.Empty : stockSymbol
+        };
+
+        return Ok(ss.GetRevenueResponse(request));
     }
 }

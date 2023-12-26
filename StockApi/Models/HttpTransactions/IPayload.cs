@@ -16,6 +16,13 @@ public interface IPagingPayload<T>
     public IEnumerable<T> Data { get; set; }
 }
 
+public struct GenerallyPagingPayload<T>(Meta meta, IEnumerable<T> data) : IPagingPayload<T>
+{
+    public Meta Meta { get; set; } = meta;
+    
+    public IEnumerable<T> Data { get; set; } = data;
+}
+
 public struct Meta
 {
     public long PageIndex { get; set; }

@@ -1,6 +1,6 @@
 ﻿using StockApi.Models.Entities;
 
-namespace StockApi.Models.DataProviders.Config;
+namespace StockApi.Models.DataProviders.Stocks;
 
 public class ConfigResult(ConfigEntity entity)
 {

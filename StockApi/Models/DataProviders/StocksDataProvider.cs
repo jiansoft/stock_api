@@ -1,11 +1,11 @@
 ﻿using jIAnSoft.Brook.Mapper;
-using StockApi.Models.DataProviders.Index;
 using StockApi.Models.Entities;
 using System.Data;
 using System.Text;
 using StockApi.Models.DataProviders.Config;
 using StockApi.Models.DataProviders.Stocks;
 using StockApi.Models.HttpTransactions;
+using System.Data.Common;
 
 namespace StockApi.Models.DataProviders;
 
@@ -226,10 +226,11 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
         return result;
     }
-    
+
     //HistoricalDailyQuote
-    
-    public HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>> GetHistoricalDailyQuote(HistoricalDailyQuoteParam param)
+
+    public HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>> GetHistoricalDailyQuote(
+        HistoricalDailyQuoteParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
         {
@@ -238,7 +239,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                                 inner join stocks as s on s.stock_exchange_market_id = sem.stock_exchange_market_id
                                 inner join "DailyQuotes" as dq on s.stock_symbol = dq."SecurityCode"
                                 """;
-             var where = $"""dq."Date" = '{param.Date:yyyy-MM-dd}' and s."SuspendListing" = false""";
+            var where = $"""dq."Date" = '{param.Date:yyyy-MM-dd}' and s."SuspendListing" = false""";
 
             using var db = Brook.Load("stock");
 
@@ -286,12 +287,13 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                  """);
 
 
-            return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, db.Query<HistoricalDailyQuoteEntity>(
-                sb.ToString(), [
-                    db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
-                    db.Parameter("@ps", param.PageSize, DbType.Int64),
-                    db.Parameter("@date", param.Date, DbType.Date)
-                ]));
+            return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta,
+                db.Query<HistoricalDailyQuoteEntity>(
+                    sb.ToString(), [
+                        db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
+                        db.Parameter("@ps", param.PageSize, DbType.Int64),
+                        db.Parameter("@date", param.Date, DbType.Date)
+                    ]));
         });
 
         return result;
@@ -336,6 +338,72 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                         db.Parameter("@ps", param.PageSize, DbType.Int64),
                         db.Parameter("@category", param.Category)
                     ]));
+            });
+
+        return result;
+    }
+
+    public RevenueResult<IEnumerable<RevenueEntity>> GetRevenue(RevenueParam param)
+    {
+        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            () =>
+            {
+                using var db = Brook.Load("stock");
+                const string table = "\"Revenue\"";
+                var where = "where 1=1 ";
+                var queryCountParams = new List<DbParameter>();
+                var queryParams = new List<DbParameter>();
+                if (!string.IsNullOrEmpty(param.StockSymbol) && !string.IsNullOrWhiteSpace(param.StockSymbol))
+                {
+
+                    where += "and \"SecurityCode\" = @sc ";
+                    queryParams.Add(db.Parameter("@sc", param.StockSymbol));
+                    queryCountParams.Add(db.Parameter("@sc", param.StockSymbol));
+
+                }
+
+                if (param.MonthOfYear != 0)
+                {
+                    where += "and \"Date\" = @d ";
+                    queryParams.Add(db.Parameter("@d", param.MonthOfYear, DbType.Int64));
+                    queryCountParams.Add(db.Parameter("@d", param.MonthOfYear, DbType.Int64));
+                }
+
+                var recordCount = GetOne(db, table, "", where, queryCountParams.ToArray());
+                var meta = new Meta(recordCount, param.PageIndex, param.PageSize);
+
+                if (recordCount == 0)
+                {
+                    return new RevenueResult<IEnumerable<RevenueEntity>>(meta, []);
+                }
+
+                queryParams.AddRange([
+                    db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
+                    db.Parameter("@ps", param.PageSize, DbType.Int64),
+                ]);
+
+                return new RevenueResult<IEnumerable<RevenueEntity>>(meta, db.Query<RevenueEntity>(
+                    """
+                     select
+                         "SecurityCode" as "StockSymbol",
+                         "Date",
+                         "Monthly",
+                         "LastMonth",
+                         "LastYearThisMonth",
+                         "MonthlyAccumulated",
+                         "LastYearMonthlyAccumulated",
+                         "ComparedWithLastMonth",
+                         "ComparedWithLastYearSameMonth",
+                         "AccumulatedComparedWithLastYear",
+                         avg_price as "AvgPrice",
+                         lowest_price as "LowestPrice",
+                         highest_price as "HighestPrice"
+                     from
+                        "Revenue"
+                    """ + where + """
+                                  order by "Date" desc, "SecurityCode"
+                                  offset @pi limit @ps;
+                                  """, queryParams.ToArray()));
             });
 
         return result;

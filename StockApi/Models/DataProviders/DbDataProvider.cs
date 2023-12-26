@@ -1,4 +1,5 @@
 ﻿using jIAnSoft.Brook.Mapper;
+using System.Data.Common;
 
 namespace StockApi.Models.DataProviders;
 
@@ -8,14 +9,16 @@ public abstract class DbDataProvider : IDataProvider
     {
         var sqlCount = $"SELECT COUNT(*) AS TotalCount FROM {table} {join} where {where}";
         var one = db.One<long>(sqlCount);
-        
+
         return one;
     }
 
-    /*
-    protected long GetOne(string table, string where)
+    protected long GetOne(SqlMapper db, string table, string join, string where, DbParameter[]? parameters)
     {
-        using var db = Brook.Load("stock");
-        return GetOne(db, table, where);
-    }*/
+
+        var sqlCount = $"SELECT COUNT(*) AS TotalCount FROM {table} {join} {where}";
+        var one = db.One<long>(sqlCount, parameters);
+
+        return one;
+    }
 }

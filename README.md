@@ -3,6 +3,16 @@ Service︰https://github.com/jiansoft/stock_crawler
 UI Demo︰https://jiansoft.mooo.com/stock/revenues  
 API Demo︰https://jiansoft.freeddns.org/swagger  
 
+### API清單
+1. 股票基本資料 [/api/stock/details](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/Details/DetailDto.cs)
+2. 股票產業分類 [/api/stock/industry](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/Industry/IndustryDto.cs)
+3. 股利發放記錄 [/api/stock/dividend/{stockSymbol}](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/Dividend/DividendDto.cs)
+4. 最後收盤數據 [/api/stock/last_daily_quote](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/DtoBase/DailyQuoteDtoBase.cs)
+5. 歷史收盤數據 [/api/stock/historical_daily_quote/{date}](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/DtoBase/DailyQuoteDtoBase.cs)
+6. 每月營收數據 [/api/stock/revenue_on/{monthOfYear}](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/Revenue/RevenueDto.cs)
+7. 股票營收數據 [/api/stock/revenue_by/{stockSymbol}](https://github.com/jiansoft/stock_api/blob/main/StockApi/Models/HttpTransactions/Stock/Revenue/RevenueDto.cs)
+
+
 ### 免責聲明
 本網提供之所有資訊內容均僅供參考，不涉及買賣投資之依據。使用者在進行投資決策時，務必自行審慎評估，
 並自負投資風險及盈虧，如依本網提供之資料交易致生損失，本網不負擔任何賠償及法律責任。您自行負責依據

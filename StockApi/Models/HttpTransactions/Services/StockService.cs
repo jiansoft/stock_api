@@ -1,4 +1,5 @@
 ﻿using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.Revenue;
 
 namespace StockApi.Models.HttpTransactions.Services;
 
@@ -25,7 +26,7 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
             var param = new StocksParam(req);
             var result = sp.GetStocks(param);
             var data = result.Entities.Select(s => new DetailDto(s));
-            var payload = new DetailsPayload<DetailDto>(result.Meta, data);
+            var payload = new GenerallyPagingPayload<DetailDto>(result.Meta, data);
             var response = new DetailsResponse<IPagingPayload<DetailDto>>(payload)
             {
                 Code = StatusCodes.Status200OK,
@@ -118,9 +119,34 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
                 var param = new HistoricalDailyQuoteParam(req);
                 var quotes = sp.GetHistoricalDailyQuote(param);
                 var data = quotes.Result.Select(s => new HistoricalDailyQuoteDto(s));
-                var payload = new HistoricalDailyQuotePayload<HistoricalDailyQuoteDto>(quotes.Meta, data);
+                var payload = new GenerallyPagingPayload<HistoricalDailyQuoteDto>(quotes.Meta, data);
                 var response =
                     new HistoricalDailyQuoteResponse<IPagingPayload<HistoricalDailyQuoteDto>>(payload)
+                    {
+                        Code = StatusCodes.Status200OK
+                    };
+
+                return response;
+            });
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="req">查詢參數</param>
+    /// <returns></returns>
+    public IResponse<IPagingPayload<RevenueDto>> GetRevenueResponse(
+        RevenueRequest req)
+    {
+        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            () =>
+            {
+                var param = new RevenueParam(req);
+                var quotes = sp.GetRevenue(param);
+                var data = quotes.Result.Select(s => new RevenueDto(s));
+                var payload = new GenerallyPagingPayload<RevenueDto>(quotes.Meta, data);
+                var response =
+                    new RevenueResponse<IPagingPayload<RevenueDto>>(payload)
                     {
                         Code = StatusCodes.Status200OK
                     };

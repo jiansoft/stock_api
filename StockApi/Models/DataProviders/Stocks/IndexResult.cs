@@ -1,7 +1,7 @@
 ﻿using StockApi.Models.Entities;
 using StockApi.Models.HttpTransactions;
 
-namespace StockApi.Models.DataProviders.Index;
+namespace StockApi.Models.DataProviders.Stocks;
 
 public class IndexResult(Meta meta, IEnumerable<IndexEntity> entities)
 {

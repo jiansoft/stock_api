@@ -1,6 +1,6 @@
 ﻿using StockApi.Models.HttpTransactions.Twse;
 
-namespace StockApi.Models.DataProviders.Index;
+namespace StockApi.Models.DataProviders.Stocks;
 
 public struct IndexParam(TaiexRequest req) : IKey
 {

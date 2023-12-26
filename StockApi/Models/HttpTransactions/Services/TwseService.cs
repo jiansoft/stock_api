@@ -1,5 +1,5 @@
 ﻿using StockApi.Models.DataProviders;
-using StockApi.Models.DataProviders.Index;
+using StockApi.Models.DataProviders.Stocks;
 using StockApi.Models.HttpTransactions.Twse;
 
 namespace StockApi.Models.HttpTransactions.Services;
