@@ -117,7 +117,6 @@ public class StockController(StockService ss) : ControllerBase
     /// 取得歷史的收盤股價
     /// </summary>
     /// <param name="monthOfYear">日期，格式︰yyyyMM</param>
-    /// <param name="stockSymbol">股票代號</param>
     /// <param name="pageIndex">取得第幾頁的數據</param>
     /// <param name="pageSize">每頁幾筆數據</param>
     /// <returns></returns>

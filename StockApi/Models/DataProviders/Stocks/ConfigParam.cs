@@ -1,4 +1,4 @@
-﻿namespace StockApi.Models.DataProviders.Config
+﻿namespace StockApi.Models.DataProviders.Stocks
 {
     public struct ConfigParam(string key) : IKey
     {
@@ -6,7 +6,7 @@
     
         public string KeyWithPrefix()
         {
-            return $"{nameof(ConfigParam)}";
+            return $"{nameof(ConfigParam)}:{Key}";
         }
     }
 }

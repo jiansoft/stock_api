@@ -16,7 +16,7 @@ public interface IPagingPayload<T>
     public IEnumerable<T> Data { get; set; }
 }
 
-public struct GenerallyPagingPayload<T>(Meta meta, IEnumerable<T> data) : IPagingPayload<T>
+public struct PagingPayload<T>(Meta meta, IEnumerable<T> data) : IPagingPayload<T>
 {
     public Meta Meta { get; set; } = meta;
     

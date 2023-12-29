@@ -1,16 +1,14 @@
-﻿using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+﻿using StockApi.Models.DataProviders;
+using StockApi.Models.DataProviders.Stocks;
+using StockApi.Models.Defines;
+using StockApi.Models.HttpTransactions.Stock.Details;
+using StockApi.Models.HttpTransactions.Stock.Dividend;
+using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.Industry;
+using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Revenue;
 
 namespace StockApi.Models.HttpTransactions.Services;
-
-using DataProviders;
-using DataProviders.Config;
-using DataProviders.Stocks;
-using Defines;
-using Stock.Details;
-using Stock.Dividend;
-using Stock.Industry;
-using Stock.LastDailyQuote;
 
 public class StockService(StocksDataProvider sp, CacheDataProvider cp)
 {
@@ -26,7 +24,7 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
             var param = new StocksParam(req);
             var result = sp.GetStocks(param);
             var data = result.Entities.Select(s => new DetailDto(s));
-            var payload = new GenerallyPagingPayload<DetailDto>(result.Meta, data);
+            var payload = new PagingPayload<DetailDto>(result.Meta, data);
             var response = new DetailsResponse<IPagingPayload<DetailDto>>(payload)
             {
                 Code = StatusCodes.Status200OK,
@@ -119,7 +117,7 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
                 var param = new HistoricalDailyQuoteParam(req);
                 var quotes = sp.GetHistoricalDailyQuote(param);
                 var data = quotes.Result.Select(s => new HistoricalDailyQuoteDto(s));
-                var payload = new GenerallyPagingPayload<HistoricalDailyQuoteDto>(quotes.Meta, data);
+                var payload = new PagingPayload<HistoricalDailyQuoteDto>(quotes.Meta, data);
                 var response =
                     new HistoricalDailyQuoteResponse<IPagingPayload<HistoricalDailyQuoteDto>>(payload)
                     {
@@ -135,8 +133,7 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
     /// </summary>
     /// <param name="req">查詢參數</param>
     /// <returns></returns>
-    public IResponse<IPagingPayload<RevenueDto>> GetRevenueResponse(
-        RevenueRequest req)
+    public IResponse<IPagingPayload<RevenueDto>> GetRevenueResponse(RevenueRequest req)
     {
         return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
@@ -144,7 +141,7 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp)
                 var param = new RevenueParam(req);
                 var quotes = sp.GetRevenue(param);
                 var data = quotes.Result.Select(s => new RevenueDto(s));
-                var payload = new GenerallyPagingPayload<RevenueDto>(quotes.Meta, data);
+                var payload = new PagingPayload<RevenueDto>(quotes.Meta, data);
                 var response =
                     new RevenueResponse<IPagingPayload<RevenueDto>>(payload)
                     {

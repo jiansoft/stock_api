@@ -2,7 +2,6 @@
 using StockApi.Models.Entities;
 using System.Data;
 using System.Text;
-using StockApi.Models.DataProviders.Config;
 using StockApi.Models.DataProviders.Stocks;
 using StockApi.Models.HttpTransactions;
 using System.Data.Common;
