@@ -1,6 +1,6 @@
 ﻿namespace StockApi.Models.Entities;
 
-public interface IEntity
-{
-    
-}
+/// <summary>
+/// 表示一個實體的介面
+/// </summary>
+public interface IEntity;

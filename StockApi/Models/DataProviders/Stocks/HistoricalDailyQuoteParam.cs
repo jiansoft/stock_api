@@ -2,11 +2,11 @@
 
 namespace StockApi.Models.DataProviders.Stocks;
 
-public struct HistoricalDailyQuoteParam(HistoricalDailyQuoteRequest req) : IKey
+internal struct HistoricalDailyQuoteParam(HistoricalDailyQuoteRequest req) : IKey
 {
     private string BaseKey { get; set; } = req.KeyWithPrefix();
-    public long PageIndex { get; set; } = req.PageIndex;
-    public long PageSize { get; set; } = req.PageSize;
+    public long PageIndex { get; set; } = req.RequestedPage;
+    public long PageSize { get; set; } = req.RecordsPerPage;
     public DateOnly Date  { get; set; } = req.Date;
 
     public string KeyWithPrefix()

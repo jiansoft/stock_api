@@ -1,5 +1,8 @@
 ﻿namespace StockApi.Models.Entities;
 
+/// <summary>
+/// 股利
+/// </summary>
 public class DividendEntity
 {
     /// <summary>

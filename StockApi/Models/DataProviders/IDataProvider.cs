@@ -1,7 +1,6 @@
-﻿using jIAnSoft.Brook.Mapper;
+﻿namespace StockApi.Models.DataProviders;
 
-namespace StockApi.Models.DataProviders;
-
-public interface IDataProvider
-{
-}
+/// <summary>
+/// 資料提供者介面
+/// </summary>
+public interface IDataProvider;

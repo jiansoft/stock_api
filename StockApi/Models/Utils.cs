@@ -1,6 +1,6 @@
 ﻿namespace StockApi.Models;
 
-public static class Utils
+internal static class Utils
 {
     public static TimeSpan GetNextTimeDiff(int hour)
     {

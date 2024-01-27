@@ -2,6 +2,10 @@
 
 namespace StockApi.Models.HttpTransactions.Stock.DtoBase;
 
+/// <summary>
+/// 表示每日報價的基礎數據傳輸對象。
+/// </summary>
+/// <param name="dqe"></param>
 public abstract class DailyQuoteDtoBase(DailyQuoteEntity dqe)
 {
     /// <summary>

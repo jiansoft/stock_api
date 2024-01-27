@@ -1,5 +1,8 @@
 ﻿namespace StockApi.Models.Entities;
 
+/// <summary>
+/// 用於表示每日報價的實體類別。
+/// </summary>
 public class DailyQuoteEntity
 {
     /// <summary>

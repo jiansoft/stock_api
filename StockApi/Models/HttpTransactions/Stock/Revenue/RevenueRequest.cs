@@ -1,15 +1,26 @@
 ﻿namespace StockApi.Models.HttpTransactions.Stock.Revenue;
 
-public struct RevenueRequest : IRequest
+/// <summary>
+///  表示用於獲取收益數據的請求類別。
+/// </summary>
+/// <param name="requestedPage">請求的頁數</param>
+/// <param name="recordsPerPage">每頁的記錄數</param>
+public class RevenueRequest(int? requestedPage, int? recordsPerPage)
+    : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
-    public long PageIndex { get; set; }
-    public long PageSize { get; set; }
+    /// <summary>
+    /// 收益數據的所屬月份
+    /// </summary>
+    public int MonthOfYear { get; init; }
 
-    public long MonthOfYear { get; set; }
-    public string StockSymbol { get; set; }
-    
-    public string KeyWithPrefix()
+    /// <summary>
+    /// 股票代號
+    /// </summary>
+    public string StockSymbol { get; init; } = string.Empty;
+
+    /// <inheritdoc />
+    public override string KeyWithPrefix()
     {
-        return $"{nameof(RevenueRequest)}:{StockSymbol}-{MonthOfYear}-{PageIndex}-{PageSize}";
+        return $"{nameof(RevenueRequest)}:{StockSymbol}-{MonthOfYear}-{RequestedPage}-{RecordsPerPage}";
     }
 }

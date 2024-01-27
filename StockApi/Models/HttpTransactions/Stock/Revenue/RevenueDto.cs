@@ -2,8 +2,15 @@
 
 namespace StockApi.Models.HttpTransactions.Stock.Revenue;
 
+/// <summary>
+/// 營收數據
+/// </summary>
+/// <param name="e"></param>
 public class RevenueDto(RevenueEntity e)
 {
+    /// <summary>
+    /// 股票編號
+    /// </summary>
     public string StockSymbol { get; set; } = e.StockSymbol;
 
     /// <summary>

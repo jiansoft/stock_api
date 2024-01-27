@@ -1,7 +1,13 @@
 ﻿namespace StockApi.Models.Entities;
 
+/// <summary>
+/// 代表營收實體的類別
+/// </summary>
 public class RevenueEntity
 {
+    /// <summary>
+    /// 股票代號
+    /// </summary>
     public string StockSymbol { get; set; } = string.Empty;
 
     /// <summary>

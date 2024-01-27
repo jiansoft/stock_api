@@ -1,12 +1,12 @@
-﻿using StockApi.Models.HttpTransactions.Twse;
+﻿using StockApi.Models.HttpTransactions;
 
 namespace StockApi.Models.DataProviders.Stocks;
 
-public struct IndexParam(TaiexRequest req) : IKey
+internal  struct IndexParam(AbstractPagingRequest req) : IKey
 {
     private string BaseKey { get; set; } = req.KeyWithPrefix();
-    public long PageIndex { get; set; } = req.PageIndex;
-    public long PageSize { get; set; } = req.PageSize;
+    public long PageIndex { get; set; } = req.RequestedPage;
+    public long PageSize { get; set; } = req.RecordsPerPage;
     public string Category { get; set; } = "TAIEX";
 
     public string KeyWithPrefix()

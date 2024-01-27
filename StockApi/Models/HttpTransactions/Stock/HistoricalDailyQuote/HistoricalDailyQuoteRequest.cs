@@ -1,13 +1,21 @@
 ﻿namespace StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
 
-public class HistoricalDailyQuoteRequest : IRequest
+/// <summary>
+/// 表示歷史每日報價的請求類別。
+/// </summary>
+/// <param name="requestedPage">要求的頁碼。</param>
+/// <param name="recordsPerPage">每頁的記錄數。</param>
+public class HistoricalDailyQuoteRequest(int? requestedPage, int? recordsPerPage)
+    : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
+    /// <summary>
+    /// 請求的日期。
+    /// </summary>
     public DateOnly Date { get; set; }
-    public long PageIndex { get; set; }
-    public long PageSize { get; set; }
 
-    public string KeyWithPrefix()
+    /// <inheritdoc />
+    public override string KeyWithPrefix()
     {
-        return $"{nameof(HistoricalDailyQuoteRequest)}:{PageIndex}-{PageSize}";
+        return $"{nameof(HistoricalDailyQuoteRequest)}:{Date}-{RequestedPage}-{RecordsPerPage}";
     }
 }

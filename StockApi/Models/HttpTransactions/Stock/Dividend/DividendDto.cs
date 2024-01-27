@@ -2,6 +2,10 @@
 
 namespace StockApi.Models.HttpTransactions.Stock.Dividend;
 
+/// <summary>
+/// 用於表示股利相關數據的 DTO (Data Transfer Object) 類別。
+/// </summary>
+/// <param name="de"></param>
 public class DividendDto(DividendEntity de)
 {
     /// <summary>

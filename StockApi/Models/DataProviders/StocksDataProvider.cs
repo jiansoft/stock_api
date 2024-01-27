@@ -8,6 +8,10 @@ using System.Data.Common;
 
 namespace StockApi.Models.DataProviders;
 
+/// <summary>
+/// 股票資料提供者
+/// </summary>
+/// <param name="cp"></param>
 public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 {
     /// <summary>
@@ -15,7 +19,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
     /// </summary>
     /// <param name="param">The parameters for retrieving the stock details.</param>
     /// <returns>The stock details.</returns>
-    public StocksResult GetStocks(StocksParam param)
+    internal StocksResult GetStocks(StocksParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
@@ -65,7 +69,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public IndustriesResult GetIndustries(IKey param)
+    internal IndustriesResult GetIndustries(IKey param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
@@ -83,7 +87,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public DividendResult GetDividend(DividendParam param)
+    internal DividendResult GetDividend(DividendParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
@@ -135,7 +139,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>> GetLastDailyQuote(LastDailyQuoteParam param)
+    internal LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>> GetLastDailyQuote(LastDailyQuoteParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
         {
@@ -203,7 +207,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public ConfigResult GetConfig(ConfigParam param)
+    internal ConfigResult GetConfig(ConfigParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
@@ -226,9 +230,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    //HistoricalDailyQuote
-
-    public HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>> GetHistoricalDailyQuote(
+    internal HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>> GetHistoricalDailyQuote(
         HistoricalDailyQuoteParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
@@ -298,7 +300,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public IndexResult GetIndex(IndexParam param)
+    internal IndexResult GetIndex(IndexParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
@@ -342,7 +344,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    public RevenueResult<IEnumerable<RevenueEntity>> GetRevenue(RevenueParam param)
+    internal RevenueResult<IEnumerable<RevenueEntity>> GetRevenue(RevenueParam param)
     {
         var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
