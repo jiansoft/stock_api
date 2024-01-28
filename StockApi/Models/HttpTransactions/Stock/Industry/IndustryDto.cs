@@ -9,6 +9,13 @@ namespace StockApi.Models.HttpTransactions.Stock.Industry;
 public class IndustryDto(IndustryEntity ie)
 {
     /// <summary>
+    /// 初始化 <see cref="IndustryDto"/> 類別的新執行個體。
+    /// </summary>
+    public IndustryDto():this(new IndustryEntity())
+    {
+    }
+    
+    /// <summary>
     /// 產業編號
     /// </summary>
     public int IndustryId { get; set; } = ie.IndustryId;

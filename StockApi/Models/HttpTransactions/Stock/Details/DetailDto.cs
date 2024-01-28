@@ -9,7 +9,7 @@ namespace StockApi.Models.HttpTransactions.Stock.Details;
 public class DetailDto(StockEntity se)
 {
     /// <summary>
-    ///  初始化 <see cref="DetailDto"/> 類別的新執行個體。
+    /// 初始化 <see cref="DetailDto"/> 類別的新執行個體。
     /// </summary>
     public DetailDto() : this(new StockEntity())
     {

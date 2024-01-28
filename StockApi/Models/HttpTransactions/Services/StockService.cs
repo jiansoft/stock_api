@@ -14,10 +14,10 @@ namespace StockApi.Models.HttpTransactions.Services;
 /// <summary>
 /// 股票服務類，負責處理股票相關的數據查詢和處理。
 /// </summary>
-/// <param name="sp">股票數據提供者，用於從數據源獲取股票數據。</param>
-/// <param name="cp">緩存數據提供者，用於緩存和檢索股票數據。</param>
+/// <param name="sdp">股票數據提供者，用於從數據源獲取股票數據。</param>
+/// <param name="cdp">緩存數據提供者，用於緩存和檢索股票數據。</param>
 /// <param name="mapper">物件對應器，用於在不同的數據模型之間進行轉換。</param>
-public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper mapper)
+public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper mapper)
 {
     /// <summary>
     /// Retrieves stock details response.
@@ -26,11 +26,11 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper m
     /// <returns>A response object containing a list of stock information.</returns>
     internal IHttpTransaction GetDetailsResponse(DetailsRequest req)
     {
-        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
+        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
         {
             var param = new StocksParam(req);
-            var result = sp.GetStocks(param);
-            var data = mapper.Map<IEnumerable<DetailDto>>(result.Entities);
+            var result = sdp.GetStocks(param);
+            var data = mapper.Map<IEnumerable<DetailDto>>(result.Result);
             var payload = new PagingPayload<DetailDto>(result.Meta, data);
             var response = new DetailsResponse<IPagingPayload<DetailDto>>(payload)
             {
@@ -48,11 +48,11 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper m
     /// <returns>股票產業分類</returns>
     internal IHttpTransaction GetIndustriesResponse(IndustriesRequest req)
     {
-        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)), () =>
+        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)), () =>
         {
             var param = new IndustriesParam(req);
-            var result = sp.GetIndustries(param);
-            var data = result.Entities.Select(s => new IndustryDto(s));
+            var result = sdp.GetIndustries(param);
+            var data = mapper.Map<IEnumerable<IndustryDto>>(result.Entities);
             var payload = new IndustriesPayload<IEnumerable<IndustryDto>>(data);
             var response = new IndustriesResponse<IPayload<IEnumerable<IndustryDto>>>(payload)
             {
@@ -70,10 +70,10 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper m
     /// <returns>股票歷年發放股利</returns>
     internal IHttpTransaction GetDividendResponse(DividendRequest req)
     {
-        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
+        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
         {
             var param = new DividendParam(req);
-            var result = sp.GetDividend(param);
+            var result = sdp.GetDividend(param);
             var data = result.Entities.Select(s => new DividendDto(s));
             var payload = new DividendPayload<IEnumerable<DividendDto>>(data);
             var response = new DividendResponse<IPayload<IEnumerable<DividendDto>>>(payload)
@@ -92,15 +92,15 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper m
     /// <returns>包含每日報價數據的回應</returns>
     internal IHttpTransaction GetLastDailyQuoteResponse(LastDailyQuoteRequest req)
     {
-        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
                 var paramLastDailyQuote = new LastDailyQuoteParam(req);
-                var quotes = sp.GetLastDailyQuote(paramLastDailyQuote);
+                var result = sdp.GetLastDailyQuote(paramLastDailyQuote);
                 var paramConfig = new ConfigParam(Constants.KeyLastClosingKay);
-                var config = sp.GetConfig(paramConfig);
-                var data = quotes.Result.Select(s => new LastDailyQuoteDto(s));
-                var payload = new LastDailyQuotePayload<LastDailyQuoteDto>(config.Entity.Val, quotes.Meta, data);
+                var config = sdp.GetConfig(paramConfig);
+                var data = mapper.Map<IEnumerable<LastDailyQuoteDto>>(result.Result);
+                var payload = new LastDailyQuotePayload<LastDailyQuoteDto>(config.Entity.Val, result.Meta, data);
                 var response = new LastDailyQuoteResponse<IPagingPayload<LastDailyQuoteDto>>(payload)
                 {
                     Code = StatusCodes.Status200OK
@@ -115,16 +115,15 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper m
     /// </summary>
     /// <param name="req">包含查詢條件的請求對象</param>
     /// <returns>包含歷史每日報價數據的回應</returns>
-    internal IHttpTransaction GetHistoricalDailyQuoteResponse(
-        HistoricalDailyQuoteRequest req)
+    internal IHttpTransaction GetHistoricalDailyQuoteResponse(HistoricalDailyQuoteRequest req)
     {
-        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
                 var param = new HistoricalDailyQuoteParam(req);
-                var quotes = sp.GetHistoricalDailyQuote(param);
-                var data = quotes.Result.Select(s => new HistoricalDailyQuoteDto(s));
-                var payload = new PagingPayload<HistoricalDailyQuoteDto>(quotes.Meta, data);
+                var result = sdp.GetHistoricalDailyQuote(param);
+                var data = mapper.Map<IEnumerable<HistoricalDailyQuoteDto>>(result.Result);
+                var payload = new PagingPayload<HistoricalDailyQuoteDto>(result.Meta, data);
                 var response =
                     new HistoricalDailyQuoteResponse<IPagingPayload<HistoricalDailyQuoteDto>>(payload)
                     {
@@ -142,13 +141,13 @@ public class StockService(StocksDataProvider sp, CacheDataProvider cp, IMapper m
     /// <returns>包含收入數據的回應</returns>
     public IHttpTransaction GetRevenueResponse(RevenueRequest req)
     {
-        return cp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
                 var param = new RevenueParam(req);
-                var quotes = sp.GetRevenue(param);
-                var data = quotes.Result.Select(s => new RevenueDto(s));
-                var payload = new PagingPayload<RevenueDto>(quotes.Meta, data);
+                var result = sdp.GetRevenue(param);
+                var data = mapper.Map<IEnumerable<RevenueDto>>(result.Result);
+                var payload = new PagingPayload<RevenueDto>(result.Meta, data);
                 var response =
                     new RevenueResponse<IPagingPayload<RevenueDto>>(payload)
                     {

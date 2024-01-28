@@ -11,5 +11,5 @@ public class DividendResult(IEnumerable<DividendEntity> entities)
     /// <summary>
     /// 初始化股利結果的新執行個體
     /// </summary>
-    public IEnumerable<DividendEntity> Entities { get; set; } = entities;
+    public IEnumerable<DividendEntity> Entities { get; } = entities;
 }

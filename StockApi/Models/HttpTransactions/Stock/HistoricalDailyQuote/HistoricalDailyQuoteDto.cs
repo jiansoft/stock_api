@@ -7,4 +7,12 @@ namespace StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
 /// 
 /// </summary>
 /// <param name="dqe"></param>
-public class HistoricalDailyQuoteDto(DailyQuoteEntity dqe) : DailyQuoteDtoBase(dqe);
+public class HistoricalDailyQuoteDto(DailyQuoteEntity dqe) : DailyQuoteDtoBase(dqe)
+{
+    /// <summary>
+    /// 初始化 <see cref="HistoricalDailyQuoteDto"/> 類別的新執行個體。
+    /// </summary>
+    public HistoricalDailyQuoteDto() : this(new DailyQuoteEntity())
+    {
+    }
+}

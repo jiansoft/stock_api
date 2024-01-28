@@ -11,8 +11,8 @@ namespace StockApi.Models.DataProviders;
 /// <summary>
 /// 股票資料提供者
 /// </summary>
-/// <param name="cp"></param>
-public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
+/// <param name="cdp"></param>
+public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
 {
     /// <summary>
     /// Retrieves the stock details based on the provided parameters.
@@ -21,7 +21,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
     /// <returns>The stock details.</returns>
     internal StocksResult GetStocks(StocksParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             const string table = "stocks";
             const string where = "stock_exchange_market_id in (2, 5)";
@@ -57,11 +57,10 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                      stock_exchange_market_id,
                      stock_industry_id, stock_symbol
                  offset @pi limit @ps
-                """, new[]
-                {
+                """, [
                     db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
                     db.Parameter("@ps", param.PageSize, DbType.Int64)
-                }));
+                ]));
 
             return result;
         });
@@ -71,7 +70,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
     internal IndustriesResult GetIndustries(IKey param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             using var db = Brook.Load("stock");
 
@@ -89,7 +88,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
     internal DividendResult GetDividend(DividendParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             using var db = Brook.Load("stock");
 
@@ -130,18 +129,17 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                 ) dq ON TRUE
                 where d.security_code = @security_code
                 order by d.year desc, year_of_dividend desc, d.quarter desc
-                """, new[]
-                {
+                """, [
                     db.Parameter("@security_code", param.StockSymbol)
-                }));
+                ]));
         });
 
         return result;
     }
 
-    internal LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>> GetLastDailyQuote(LastDailyQuoteParam param)
+    internal LastDailyQuoteResult GetLastDailyQuote(LastDailyQuoteParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
         {
             const string table = "stock_exchange_market as sem";
             const string join = """
@@ -157,7 +155,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
             if (recordCount == 0)
             {
-                return new LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>>(meta, []);
+                return new LastDailyQuoteResult(meta, []);
             }
 
             var sb = new StringBuilder();
@@ -196,12 +194,11 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                 """);
 
 
-            return new LastDailyQuoteResult<IEnumerable<LastDailyQuoteEntity>>(meta, db.Query<LastDailyQuoteEntity>(
-                sb.ToString(), new[]
-                {
+            return new LastDailyQuoteResult(meta, db.Query<LastDailyQuoteEntity>(
+                sb.ToString(), [
                     db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
                     db.Parameter("@ps", param.PageSize, DbType.Int64)
-                }));
+                ]));
         });
 
         return result;
@@ -209,7 +206,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
     internal ConfigResult GetConfig(ConfigParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
                 using var db = Brook.Load("stock");
@@ -230,10 +227,9 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
         return result;
     }
 
-    internal HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>> GetHistoricalDailyQuote(
-        HistoricalDailyQuoteParam param)
+    internal HistoricalDailyQuoteResult GetHistoricalDailyQuote(HistoricalDailyQuoteParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromMinutes(1)), () =>
         {
             const string table = "stock_exchange_market as sem";
             const string join = """
@@ -249,7 +245,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
             if (recordCount == 0)
             {
-                return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, []);
+                return new HistoricalDailyQuoteResult(meta, []);
             }
 
             var sb = new StringBuilder();
@@ -288,7 +284,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
                  """);
 
 
-            return new HistoricalDailyQuoteResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta,
+            return new HistoricalDailyQuoteResult(meta,
                 db.Query<HistoricalDailyQuoteEntity>(
                     sb.ToString(), [
                         db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
@@ -302,7 +298,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
     internal IndexResult GetIndex(IndexParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
                 const string table = "index";
@@ -346,7 +342,7 @@ public class StocksDataProvider(CacheDataProvider cp) : DbDataProvider
 
     internal RevenueResult<IEnumerable<RevenueEntity>> GetRevenue(RevenueParam param)
     {
-        var result = cp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+        var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
             {
                 using var db = Brook.Load("stock");

@@ -11,5 +11,5 @@ public class IndustriesResult(IEnumerable<IndustryEntity> entities)
     /// <summary>
     /// 取得或設定產業實體的集合
     /// </summary>
-    public IEnumerable<IndustryEntity> Entities { get; set; } = entities;
+    public IEnumerable<IndustryEntity> Entities { get; } = entities;
 }

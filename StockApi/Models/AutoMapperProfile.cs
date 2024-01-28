@@ -1,6 +1,11 @@
 ﻿using AutoMapper;
 using StockApi.Models.Entities;
 using StockApi.Models.HttpTransactions.Stock.Details;
+using StockApi.Models.HttpTransactions.Stock.DtoBase;
+using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.Industry;
+using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.Revenue;
 
 namespace StockApi.Models;
 
@@ -15,5 +20,21 @@ public class AutoMapperProfile : Profile
     public AutoMapperProfile()
     {
         CreateMap<StockEntity, DetailDto>();
+        CreateMap<RevenueEntity, RevenueDto>();
+        CreateMap<IndustryEntity, IndustryDto>();
+        CreateMap<DailyQuoteEntity, HistoricalDailyQuoteDto>()
+            .ForMember(
+                dest => dest.MaximumPriceInYearDateOn,
+                opt => opt.MapFrom(src => DateOnly.FromDateTime(src.MaximumPriceInYearDateOn)))
+            .ForMember(
+                dest => dest.MinimumPriceInYearDateOn,
+                opt => opt.MapFrom(src => DateOnly.FromDateTime(src.MinimumPriceInYearDateOn)));
+        CreateMap<DailyQuoteEntity, LastDailyQuoteDto>()
+            .ForMember(
+                dest => dest.MaximumPriceInYearDateOn,
+                opt => opt.MapFrom(src => DateOnly.FromDateTime(src.MaximumPriceInYearDateOn)))
+            .ForMember(
+                dest => dest.MinimumPriceInYearDateOn,
+                opt => opt.MapFrom(src => DateOnly.FromDateTime(src.MinimumPriceInYearDateOn)));
     }
 }

@@ -9,14 +9,4 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// <param name="meta">元數據</param>
 /// <param name="entities">股票實體集合</param>
 public class StocksResult(Meta meta, IEnumerable<StockEntity> entities)
-{
-    /// <summary>
-    /// 分頁的元數據
-    /// </summary>
-    public Meta Meta { get; set; } = meta;
-    
-    /// <summary>
-    /// 股票實體集合
-    /// </summary>
-    public IEnumerable<StockEntity> Entities { get; set; } = entities;
-}
+    : AbstractPagingDataResult<IEnumerable<StockEntity>>(meta, entities);

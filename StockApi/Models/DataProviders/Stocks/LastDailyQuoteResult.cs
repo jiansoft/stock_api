@@ -1,4 +1,5 @@
-﻿using StockApi.Models.HttpTransactions;
+﻿using StockApi.Models.Entities;
+using StockApi.Models.HttpTransactions;
 
 namespace StockApi.Models.DataProviders.Stocks;
 
@@ -7,14 +8,5 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// </summary>
 /// <param name="meta"></param>
 /// <param name="entities"></param>
-/// <typeparam name="T"></typeparam>
-public class LastDailyQuoteResult<T>(Meta meta, T entities) : IDataResult<T>
-{
-    /// <summary>
-    /// 分頁的元數據
-    /// </summary>
-    public Meta Meta { get; set; } = meta;
-
-    /// <inheritdoc />
-    public T Result { get; set; } = entities;
-}
+public class LastDailyQuoteResult(Meta meta, IEnumerable<LastDailyQuoteEntity> entities) 
+    : AbstractPagingDataResult<IEnumerable<LastDailyQuoteEntity>>(meta, entities);

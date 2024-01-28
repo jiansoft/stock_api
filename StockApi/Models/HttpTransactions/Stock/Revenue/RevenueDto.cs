@@ -9,6 +9,13 @@ namespace StockApi.Models.HttpTransactions.Stock.Revenue;
 public class RevenueDto(RevenueEntity e)
 {
     /// <summary>
+    /// 初始化 <see cref="RevenueDto"/> 類別的新執行個體。
+    /// </summary>
+    public RevenueDto(): this(new RevenueEntity())
+    {
+    }
+    
+    /// <summary>
     /// 股票編號
     /// </summary>
     public string StockSymbol { get; set; } = e.StockSymbol;
