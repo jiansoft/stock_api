@@ -1,4 +1,4 @@
-﻿namespace StockApi.Models
+﻿namespace StockApi.Models.Defines
 {
     /// <summary>
     /// 

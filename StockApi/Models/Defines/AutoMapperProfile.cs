@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using StockApi.Models.Entities;
 using StockApi.Models.HttpTransactions.Stock.Details;
-using StockApi.Models.HttpTransactions.Stock.DtoBase;
 using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Industry;
 using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Revenue;
 
-namespace StockApi.Models;
+namespace StockApi.Models.Defines;
 
 /// <summary>
 /// 用於組態 AutoMapper 對應組態的類別。

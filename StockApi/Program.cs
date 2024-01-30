@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using StockApi.Middlewares;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
+using StockApi.Models.Defines;
 using StockApi.Models.HttpTransactions.Services;
 using System.Reflection;
 using Unchase.Swashbuckle.AspNetCore.Extensions.Extensions;
