@@ -6,7 +6,7 @@ using StockApi.Middlewares;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
 using StockApi.Models.Defines;
-using StockApi.Models.HttpTransactions.Services;
+using StockApi.Services;
 using System.Reflection;
 using Unchase.Swashbuckle.AspNetCore.Extensions.Extensions;
 using Unchase.Swashbuckle.AspNetCore.Extensions.Options;
@@ -80,11 +80,13 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 builder.Services.AddDbContext<TodoContext>(opt => opt.UseInMemoryDatabase("TodoList"));
-builder.Services.Configure<AttachmentOptions>(builder.Configuration.GetSection("Attachment"));
-    
+
+builder.Services.Configure<GrpcOptions>(builder.Configuration.GetSection("GRPC"));
+
 builder.Services.AddSingleton<CacheDataProvider>();
 builder.Services.AddSingleton<StocksDataProvider>();
     
+builder.Services.AddSingleton<GrpcService>();
 builder.Services.AddSingleton<StockService>();
 builder.Services.AddSingleton<TwseService>();
     
@@ -140,7 +142,7 @@ app.MapRazorPages();
     pattern: "{controller=Home}/{action=Index}/{id?}");*/
 app.MapControllers();
 app.UseCors("CorsPolicy");
-    
+
 logger.Debug($"{app.Environment.EnvironmentName}");
     
 await app.RunAsync();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockApi.Models.HttpTransactions;
-using StockApi.Models.HttpTransactions.Services;
 using StockApi.Models.HttpTransactions.Twse;
+using StockApi.Services;
 
 namespace StockApi.Controllers;
 

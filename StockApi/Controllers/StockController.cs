@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StockApi.Models.HttpTransactions;
-using StockApi.Models.HttpTransactions.Services;
 using StockApi.Models.HttpTransactions.Stock.Details;
 using StockApi.Models.HttpTransactions.Stock.Dividend;
 using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.HolidaySchedule;
 using StockApi.Models.HttpTransactions.Stock.Industry;
 using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Revenue;
+using StockApi.Services;
 
 namespace StockApi.Controllers;
 
@@ -40,7 +41,7 @@ public class StockController(StockService ss) : ControllerBase
     /// <returns>股票產業分類</returns>
     [HttpGet]
     [Route("industry")]
-    [ProducesResponseType<IResponse<IPagingPayload<IndustryDto>>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IResponse<IPayload<IEnumerable<IndustryDto>>>>(StatusCodes.Status200OK)]
     public IActionResult Industries()
     {
         return Ok(ss.GetIndustriesResponse(new IndustriesRequest()));
@@ -52,7 +53,7 @@ public class StockController(StockService ss) : ControllerBase
     /// <returns>股票產業分類</returns>
     [HttpGet]
     [Route("dividend/{stockSymbol}")]
-    [ProducesResponseType<IResponse<IPagingPayload<DividendDto>>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<IResponse<IPayload<IEnumerable<DividendDto>>>>(StatusCodes.Status200OK)]
     public IActionResult Dividend(string stockSymbol)
     {
         var request = new DividendRequest(stockSymbol);
@@ -134,5 +135,19 @@ public class StockController(StockService ss) : ControllerBase
         };
 
         return Ok(ss.GetRevenueResponse(request));
+    }
+
+    /// <summary>
+    /// 獲取指定年份的休市日期
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("holiday_schedule/{year:int}")]
+    [ProducesResponseType<IResponse<IPayload<IEnumerable<HolidayScheduleDto>>>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> HolidaySchedule(int year)
+    {
+        var request = new HolidayScheduleRequest(year);
+        
+        return Ok(await ss.GetHolidayScheduleResponse(request));
     }
 }

@@ -1,8 +1,10 @@
-﻿using StockApi.Models.DataProviders;
+﻿using StockApi.Models;
+using StockApi.Models.DataProviders;
 using StockApi.Models.DataProviders.Stocks;
+using StockApi.Models.HttpTransactions;
 using StockApi.Models.HttpTransactions.Twse;
 
-namespace StockApi.Models.HttpTransactions.Services;
+namespace StockApi.Services;
 
 /// <summary>
 /// 提供台灣證券交易所相關服務的類別，負責從數據來源獲取和處理台灣加權股價指數（TAIEX）等相關數據。

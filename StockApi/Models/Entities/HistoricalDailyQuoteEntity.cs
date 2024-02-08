@@ -1,6 +1,4 @@
 ﻿namespace StockApi.Models.Entities;
 
 /// <inheritdoc />
-public class HistoricalDailyQuoteEntity : DailyQuoteEntity
-{
-}
+public class HistoricalDailyQuoteEntity : DailyQuoteEntity;

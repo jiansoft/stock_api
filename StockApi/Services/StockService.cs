@@ -1,15 +1,20 @@
 ﻿using AutoMapper;
+using Stock;
+using StockApi.Models;
 using StockApi.Models.DataProviders;
 using StockApi.Models.DataProviders.Stocks;
 using StockApi.Models.Defines;
+using StockApi.Models.HttpTransactions;
 using StockApi.Models.HttpTransactions.Stock.Details;
 using StockApi.Models.HttpTransactions.Stock.Dividend;
 using StockApi.Models.HttpTransactions.Stock.HistoricalDailyQuote;
+using StockApi.Models.HttpTransactions.Stock.HolidaySchedule;
 using StockApi.Models.HttpTransactions.Stock.Industry;
 using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Revenue;
 
-namespace StockApi.Models.HttpTransactions.Services;
+
+namespace StockApi.Services;
 
 /// <summary>
 /// 股票服務類，負責處理股票相關的數據查詢和處理。
@@ -17,7 +22,8 @@ namespace StockApi.Models.HttpTransactions.Services;
 /// <param name="sdp">股票數據提供者，用於從數據源獲取股票數據。</param>
 /// <param name="cdp">緩存數據提供者，用於緩存和檢索股票數據。</param>
 /// <param name="mapper">物件對應器，用於在不同的數據模型之間進行轉換。</param>
-public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper mapper)
+/// <param name="gs">gRPC提供者</param>
+public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper mapper, GrpcService gs)
 {
     /// <summary>
     /// Retrieves stock details response.
@@ -156,5 +162,24 @@ public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper
 
                 return response;
             });
+    }
+
+    /// <summary>
+    /// 獲取指定年份的休市日期
+    /// </summary>
+    /// <param name="req"></param>
+    /// <returns></returns>
+    internal async Task<IHttpTransaction> GetHolidayScheduleResponse(
+        Models.HttpTransactions.Stock.HolidaySchedule.HolidayScheduleRequest req)
+    {
+        var result = await gs.FetchHolidayScheduleAsync(req.Year);
+        var data = mapper.Map<IEnumerable<HolidayScheduleDto>>(result);
+        var payload = new HolidaySchedulePayload<IEnumerable<HolidayScheduleDto>>(data);
+        var response =
+            new HolidayScheduleResponse<IPayload<IEnumerable<HolidayScheduleDto>>>(payload)
+            {
+                Code = StatusCodes.Status200OK
+            };
+        return response;
     }
 }

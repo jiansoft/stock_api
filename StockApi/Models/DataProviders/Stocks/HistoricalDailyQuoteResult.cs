@@ -8,6 +8,5 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// </summary>
 /// <param name="meta"></param>
 /// <param name="entities"></param>
-/// <typeparam name="T"></typeparam>
 public class HistoricalDailyQuoteResult(Meta meta, IEnumerable<HistoricalDailyQuoteEntity> entities) 
     : AbstractPagingDataResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, entities);
