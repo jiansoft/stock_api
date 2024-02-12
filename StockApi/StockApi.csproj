@@ -43,7 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\HttpTransactions\Services\" />
     <Folder Include="Views\" />
     <Protobuf Include="etc\proto\basic.proto" GrpcServices="None" />
     <Protobuf Include="etc\proto\stock.proto" GrpcServices="Client" />

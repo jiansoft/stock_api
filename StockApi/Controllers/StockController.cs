@@ -147,7 +147,8 @@ public class StockController(StockService ss) : ControllerBase
     public async Task<IActionResult> HolidaySchedule(int year)
     {
         var request = new HolidayScheduleRequest(year);
+        var response = await ss.GetHolidayScheduleResponseAsync(request);
         
-        return Ok(await ss.GetHolidayScheduleResponse(request));
+        return Ok(response);
     }
 }

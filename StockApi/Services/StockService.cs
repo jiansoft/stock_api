@@ -169,17 +169,21 @@ public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
-    internal async Task<IHttpTransaction> GetHolidayScheduleResponse(
+    internal async Task<IHttpTransaction> GetHolidayScheduleResponseAsync(
         Models.HttpTransactions.Stock.HolidaySchedule.HolidayScheduleRequest req)
     {
-        var result = await gs.FetchHolidayScheduleAsync(req.Year);
-        var data = mapper.Map<IEnumerable<HolidayScheduleDto>>(result);
-        var payload = new HolidaySchedulePayload<IEnumerable<HolidayScheduleDto>>(data);
-        var response =
-            new HolidayScheduleResponse<IPayload<IEnumerable<HolidayScheduleDto>>>(payload)
+        return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
+            async () =>
             {
-                Code = StatusCodes.Status200OK
-            };
-        return response;
+                var result = await gs.FetchHolidayScheduleAsync(req.Year);
+                var data = mapper.Map<IEnumerable<HolidayScheduleDto>>(result);
+                var payload = new HolidaySchedulePayload<IEnumerable<HolidayScheduleDto>>(data);
+                var response =
+                    new HolidayScheduleResponse<IPayload<IEnumerable<HolidayScheduleDto>>>(payload)
+                    {
+                        Code = StatusCodes.Status200OK
+                    };
+                return response;
+            });
     }
 }

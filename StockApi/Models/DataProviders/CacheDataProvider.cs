@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using System.Collections.Concurrent;
 
 namespace StockApi.Models.DataProviders;
 
@@ -20,6 +21,53 @@ public class CacheDataProvider(IMemoryCache cache) : IDataProvider
         return new MemoryCacheEntryOptions().SetAbsoluteExpiration(relative);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="option"></param>
+    /// <param name="factory"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public async Task<T> GetOrSetAsync<T>(string key, MemoryCacheEntryOptions option, Func<Task<T>> factory)
+    {
+        if (Get<T>(key) is { } cachedValue)
+        {
+            return cachedValue;
+        }
+
+        var semaphore = GetSemaphoreForKey(key);
+
+        // 等待信号量，以异步方式锁定代码块
+        await semaphore.WaitAsync();
+
+        try
+        {
+            if (Get<T>(key) is { } doubleCheckedCachedValue)
+            {
+                return doubleCheckedCachedValue;
+            }
+            
+            var valueToCache = await factory.Invoke();
+            
+            Set(key, valueToCache, option);
+
+            return valueToCache;
+        }
+        finally
+        {
+            semaphore.Release();
+        }
+    }
+
+    private readonly ConcurrentDictionary<string, SemaphoreSlim> _semaphores = new();
+
+    // 示例：获取每个键的信号量实例
+    private SemaphoreSlim GetSemaphoreForKey(string key)
+    {
+        return _semaphores.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
+    }
+    
     /// <summary>
     /// 獲取或設定快取數據。如果快取中已存在數據，則返回該數據；否則，使用工廠方法創建數據並存入快取。
     /// </summary>

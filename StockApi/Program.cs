@@ -24,15 +24,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
-    /*option.SwaggerDoc("v1", new OpenApiInfo
-
-    {
-
-        Version = "v1",
-
-        Title = "test api",
-
-    });*/
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     option.IncludeXmlComments(xmlPath);
