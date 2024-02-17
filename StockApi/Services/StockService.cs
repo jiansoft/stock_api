@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Stock;
+using Microsoft.EntityFrameworkCore;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
 using StockApi.Models.DataProviders.Stocks;
@@ -13,7 +13,6 @@ using StockApi.Models.HttpTransactions.Stock.Industry;
 using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Revenue;
 
-
 namespace StockApi.Services;
 
 /// <summary>
@@ -23,50 +22,54 @@ namespace StockApi.Services;
 /// <param name="cdp">緩存數據提供者，用於緩存和檢索股票數據。</param>
 /// <param name="mapper">物件對應器，用於在不同的數據模型之間進行轉換。</param>
 /// <param name="gs">gRPC提供者</param>
-public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper mapper, GrpcService gs)
+public class StockService(
+    StocksDataProvider sdp,
+    CacheDataProvider cdp,
+    IMapper mapper,
+    GrpcService gs)
 {
-    /// <summary>
-    /// Retrieves stock details response.
-    /// </summary>
-    /// <param name="req">The request object containing the necessary information to retrieve stock details.</param>
-    /// <returns>A response object containing a list of stock information.</returns>
-    internal IHttpTransaction GetDetailsResponse(DetailsRequest req)
+    internal async Task<IHttpTransaction> GetDetailsAsync(DetailsRequest req, StockContext sc)
     {
-        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
-        {
-            var param = new StocksParam(req);
-            var result = sdp.GetStocks(param);
-            var data = mapper.Map<IEnumerable<DetailDto>>(result.Result);
-            var payload = new PagingPayload<DetailDto>(result.Meta, data);
-            var response = new DetailsResponse<IPagingPayload<DetailDto>>(payload)
+        return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)),
+            async () =>
             {
-                Code = StatusCodes.Status200OK,
-            };
+                var condition = new[] { 2, 4, 5 };
+                var totalRecords = await sc.Stocks.CountAsync(w => condition.Contains(w.ExchangeMarketId));
+                var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
+                var query = sc.Stocks.Where(w => condition.Contains(w.ExchangeMarketId))
+                    .OrderBy(ob => ob.ExchangeMarketId)
+                    .ThenBy(tb => tb.IndustryId)
+                    .ThenBy(tb => tb.StockSymbol)
+                    .Skip((int)((meta.RequestedPage - 1) * meta.RecordsPerPage))
+                    .Take((int)meta.RecordsPerPage)
+                    .AsNoTrackingWithIdentityResolution();
+                var data = await mapper.ProjectTo<DetailDto>(query).ToListAsync();
+                var payload = new PagingPayload<DetailDto>(meta, data);
+                var response = new DetailsResponse<IPagingPayload<DetailDto>>(StatusCodes.Status200OK, payload);
 
-            return response;
-        });
+                return response;
+            });
     }
 
     /// <summary>
     /// 股票產業分類
     /// </summary>
     /// <param name="req">查詢參數</param>
+    /// <param name="sc"></param>
     /// <returns>股票產業分類</returns>
-    internal IHttpTransaction GetIndustriesResponse(IndustriesRequest req)
+    internal async Task<IHttpTransaction> GetIndustriesAsync(IndustriesRequest req, StockContext sc)
     {
-        return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)), () =>
-        {
-            var param = new IndustriesParam(req);
-            var result = sdp.GetIndustries(param);
-            var data = mapper.Map<IEnumerable<IndustryDto>>(result.Entities);
-            var payload = new IndustriesPayload<IEnumerable<IndustryDto>>(data);
-            var response = new IndustriesResponse<IPayload<IEnumerable<IndustryDto>>>(payload)
+        return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)),
+            async () =>
             {
-                Code = StatusCodes.Status200OK
-            };
+                var result = await sc.Industries.AsNoTrackingWithIdentityResolution().ToListAsync();
+                var data = mapper.Map<IEnumerable<IndustryDto>>(result);
+                var payload = new IndustriesPayload<IEnumerable<IndustryDto>>(data);
+                var response =
+                    new IndustriesResponse<IPayload<IEnumerable<IndustryDto>>>(StatusCodes.Status200OK, payload);
 
-            return response;
-        });
+                return response;
+            });
     }
 
     /// <summary>
@@ -145,7 +148,7 @@ public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper
     /// </summary>
     /// <param name="req">包含查詢條件的請求對象</param>
     /// <returns>包含收入數據的回應</returns>
-    public IHttpTransaction GetRevenueResponse(RevenueRequest req)
+    internal IHttpTransaction GetRevenueResponse(RevenueRequest req)
     {
         return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
@@ -169,8 +172,7 @@ public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, IMapper
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
-    internal async Task<IHttpTransaction> GetHolidayScheduleResponseAsync(
-        Models.HttpTransactions.Stock.HolidaySchedule.HolidayScheduleRequest req)
+    internal async Task<IHttpTransaction> GetHolidayScheduleResponseAsync(HolidayScheduleRequest req)
     {
         return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             async () =>

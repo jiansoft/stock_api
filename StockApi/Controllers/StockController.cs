@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StockApi.Models.DataProviders;
 using StockApi.Models.HttpTransactions;
 using StockApi.Models.HttpTransactions.Stock.Details;
 using StockApi.Models.HttpTransactions.Stock.Dividend;
@@ -15,9 +16,10 @@ namespace StockApi.Controllers;
 /// 控製器用於處理與股票相關的HTTP請求。提供了獲取股票基本資訊、股票行業分類、分紅資訊、最近的收盤價、歷史收盤價及收入資料的方法。
 /// </summary>
 /// <param name="ss">提供股票相關服務的服務類實例。</param>
+/// <param name="sc"></param>
 [Route("api/stock")]
 [ApiController]
-public class StockController(StockService ss) : ControllerBase
+public class StockController(StockService ss, StockContext sc) : ControllerBase
 {
     /// <summary>
     /// 獲取股票基本資料
@@ -28,11 +30,12 @@ public class StockController(StockService ss) : ControllerBase
     [HttpGet]
     [Route("details")]
     [ProducesResponseType<IResponse<IPagingPayload<DetailDto>>>(StatusCodes.Status200OK)]
-    public IActionResult Details(int? requestedPage, int? recordsPerPage)
+    public async Task<IActionResult> Details(int? requestedPage, int? recordsPerPage)
     {
         var request = new DetailsRequest(requestedPage, recordsPerPage);
+        var response = await ss.GetDetailsAsync(request, sc);
 
-        return Ok(ss.GetDetailsResponse(request));
+        return Ok(response);
     }
 
     /// <summary>
@@ -42,9 +45,11 @@ public class StockController(StockService ss) : ControllerBase
     [HttpGet]
     [Route("industry")]
     [ProducesResponseType<IResponse<IPayload<IEnumerable<IndustryDto>>>>(StatusCodes.Status200OK)]
-    public IActionResult Industries()
+    public async Task<IActionResult> Industries()
     {
-        return Ok(ss.GetIndustriesResponse(new IndustriesRequest()));
+        var response = await ss.GetIndustriesAsync(new IndustriesRequest(), sc);
+
+        return Ok(response);
     }
 
     /// <summary>
@@ -148,7 +153,7 @@ public class StockController(StockService ss) : ControllerBase
     {
         var request = new HolidayScheduleRequest(year);
         var response = await ss.GetHolidayScheduleResponseAsync(request);
-        
+
         return Ok(response);
     }
 }

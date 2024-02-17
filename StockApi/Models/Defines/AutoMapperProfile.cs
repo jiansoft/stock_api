@@ -7,6 +7,7 @@ using StockApi.Models.HttpTransactions.Stock.HolidaySchedule;
 using StockApi.Models.HttpTransactions.Stock.Industry;
 using StockApi.Models.HttpTransactions.Stock.LastDailyQuote;
 using StockApi.Models.HttpTransactions.Stock.Revenue;
+using StockApi.Models.HttpTransactions.Twse;
 
 namespace StockApi.Models.Defines;
 
@@ -22,7 +23,7 @@ public class AutoMapperProfile : Profile
     {
         CreateMap<StockEntity, DetailDto>();
         CreateMap<RevenueEntity, RevenueDto>();
-        CreateMap<IndustryEntity, IndustryDto>();
+        CreateMap<StockIndustryEntity, IndustryDto>();
         CreateMap<DailyQuoteEntity, HistoricalDailyQuoteDto>()
             .ForMember(
                 dest => dest.MaximumPriceInYearDateOn,
@@ -39,6 +40,11 @@ public class AutoMapperProfile : Profile
                 opt => opt.MapFrom(src => DateOnly.FromDateTime(src.MinimumPriceInYearDateOn)));
 
         CreateMap<HolidaySchedule, HolidayScheduleDto>();
+        
+        CreateMap<IndexEntity, TaiexDto>()
+            .ForMember(
+                dest => dest.Date,
+                opt => opt.MapFrom(src => DateOnly.FromDateTime(src.Date)));
     }
     
 }

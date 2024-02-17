@@ -1,4 +1,6 @@
-﻿namespace StockApi.Models.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StockApi.Models.Entities;
 
 /// <summary>
 /// 代表股市指數的實體類別，包含與股市指數相關的各項數據。
@@ -6,9 +8,20 @@
 public class IndexEntity
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public long Serial { get; set; }
+    
+    /// <summary>
     /// 日期。
     /// </summary>
     public DateTime Date { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    [StringLength(255)]
+    public string Category { get; set; } = string.Empty;
 
     /// <summary>
     /// 交易量。

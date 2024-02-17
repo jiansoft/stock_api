@@ -3,5 +3,5 @@
 /// <summary>
 /// 定義一個HTTP請求的基本介面，繼承自IHttpTransaction，用於實現各種HTTP請求。
 /// </summary>
-public interface IRequest : IHttpTransaction;
+internal interface IRequest : IHttpTransaction;
 

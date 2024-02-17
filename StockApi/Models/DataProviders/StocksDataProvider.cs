@@ -14,7 +14,7 @@ namespace StockApi.Models.DataProviders;
 /// <param name="cdp"></param>
 public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
 {
-    /// <summary>
+    /*/// <summary>
     /// Retrieves the stock details based on the provided parameters.
     /// </summary>
     /// <param name="param">The parameters for retrieving the stock details.</param>
@@ -24,7 +24,7 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
         var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             const string table = "stocks";
-            const string where = "stock_exchange_market_id in (2, 5)";
+            const string where = "stock_exchange_market_id in (2, 4, 5)";
 
             using var db = Brook.Load("stock");
 
@@ -66,15 +66,15 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
         });
 
         return result;
-    }
+    }*/
 
-    internal IndustriesResult GetIndustries(IKey param)
+    /*internal IndustriesResult GetIndustries(IKey param)
     {
         var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromHours(1)), () =>
         {
             using var db = Brook.Load("stock");
 
-            return new IndustriesResult(db.Query<IndustryEntity>(
+            return new IndustriesResult(db.Query<StockIndustryEntity>(
                 """
                 select
                     stock_industry_id as "IndustryId", name as "Name"
@@ -84,7 +84,7 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
         });
 
         return result;
-    }
+    }*/
 
     internal DividendResult GetDividend(DividendParam param)
     {

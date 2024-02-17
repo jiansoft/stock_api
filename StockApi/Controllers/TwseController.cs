@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StockApi.Models.DataProviders;
 using StockApi.Models.HttpTransactions;
 using StockApi.Models.HttpTransactions.Twse;
 using StockApi.Services;
@@ -6,12 +7,13 @@ using StockApi.Services;
 namespace StockApi.Controllers;
 
 /// <summary>
-/// 台灣證券交易所（TWSE）相關數據的控制器，負責處理與台灣證券交易所相關的HTTP請求。
+/// 提供台灣證券交易所(TWSE)相關數據的API控制器。
 /// </summary>
-/// <param name="ts">台灣證券交易所服務的實例，用於處理相關請求。</param>
+/// <param name="ts">提供台灣證券交易所數據的服務。</param>
+/// <param name="sc">股票數據的上下文，用於訪問數據庫。</param>
 [Route("api/twse")]
 [ApiController]
-public class TwseController(TwseService ts) : ControllerBase
+public class TwseController(TwseService ts, StockContext sc) : ControllerBase
 {
     /// <summary>
     /// 獲取台灣加權股價指數（TAIEX）的數據。
@@ -22,11 +24,11 @@ public class TwseController(TwseService ts) : ControllerBase
     [HttpGet]
     [Route("taiex")]
     [ProducesResponseType<IResponse<IPagingPayload<TaiexDto>>>(StatusCodes.Status200OK)]
-    public IActionResult Taiex(int? requestedPage, int? recordsPerPage)
+    public async Task<IActionResult> Taiex(int? requestedPage, int? recordsPerPage)
     {
-        var request = new TaiexRequest
-            (requestedPage, recordsPerPage);
+        var request = new TaiexRequest(requestedPage, recordsPerPage);
+        var response = await ts.GetTaiexAsync(request, sc);
 
-        return Ok(ts.GetTaiexResponse(request));
+        return Ok(response);
     }
 }

@@ -6,10 +6,10 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 用來表示產業資訊結果的類別
 /// </summary>
 /// <param name="entities"></param>
-public class IndustriesResult(IEnumerable<IndustryEntity> entities)
+public class IndustriesResult(IEnumerable<StockIndustryEntity> entities)
 {
     /// <summary>
     /// 取得或設定產業實體的集合
     /// </summary>
-    public IEnumerable<IndustryEntity> Entities { get; } = entities;
+    public IEnumerable<StockIndustryEntity> Entities { get; } = entities;
 }

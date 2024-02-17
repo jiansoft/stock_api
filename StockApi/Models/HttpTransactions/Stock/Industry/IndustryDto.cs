@@ -6,12 +6,12 @@ namespace StockApi.Models.HttpTransactions.Stock.Industry;
 /// 表示用於表示產業數據的數據傳輸對象（DTO）類別。
 /// </summary>
 /// <param name="ie">產業實體</param>
-public class IndustryDto(IndustryEntity ie)
+public class IndustryDto(StockIndustryEntity ie)
 {
     /// <summary>
     /// 初始化 <see cref="IndustryDto"/> 類別的新執行個體。
     /// </summary>
-    public IndustryDto():this(new IndustryEntity())
+    public IndustryDto():this(new StockIndustryEntity())
     {
     }
     

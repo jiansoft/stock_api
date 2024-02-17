@@ -9,6 +9,11 @@ public class TaiexRequest (int? requestedPage, int? recordsPerPage)
     : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public string Category => "TAIEX";
+    
+    /// <summary>
     /// 生成包含前綴的唯一鍵值，用於識別此分頁請求。
     /// </summary>
     /// <returns>格式化的字符串，包含請求的分頁信息。</returns>

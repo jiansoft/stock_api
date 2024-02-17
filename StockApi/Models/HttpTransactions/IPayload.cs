@@ -49,7 +49,7 @@ public struct PagingPayload<T>(Meta meta, IEnumerable<T> data) : IPagingPayload<
 /// <summary>
 /// 描述分頁查詢的元數據資訊。
 /// </summary>
-public struct Meta
+public record Meta
 {
     /// <summary>
     /// 請求的頁碼。

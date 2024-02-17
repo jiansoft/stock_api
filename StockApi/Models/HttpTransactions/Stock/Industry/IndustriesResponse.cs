@@ -16,19 +16,12 @@ public class IndustriesPayload<T>(T data) : IPayload<T> where T : IEnumerable
 /// <summary>
 /// 用於封裝股票產業分類請求的回應類別。
 /// </summary>
-/// <param name="data">包含股票產業分類回應數據的對象。</param>
 /// <typeparam name="T">股票產業分類回應數據的類型。</typeparam>
-public class IndustriesResponse<T>(T data): IResponse<T>
+public record IndustriesResponse<T>(int Code, T Payload) : IResponseV1<T>
 {
     /// <inheritdoc />
     public string KeyWithPrefix()
     {
-        return $"{nameof(IndustriesResponse<T>)}";
+        return $"{nameof(IndustriesResponse<T>)}-{typeof(T).Name}-{Code}";
     }
-
-    /// <inheritdoc />
-    public int Code { get; set; }
-
-    /// <inheritdoc />
-    public T Payload { get; set; } = data;
 }

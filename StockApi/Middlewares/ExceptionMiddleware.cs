@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿
 using StockApi.Models.Exceptions;
 using StockApi.Models.HttpTransactions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace StockApi.Middlewares;
 
@@ -49,26 +51,33 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
     {
         logger.LogError(ex, "{Message}", ex.Message);
     }
-    
+
     private static bool IsApiRequest(HttpContext httpContext)
     {
         return httpContext.Request.Path.StartsWithSegments("/api");
     }
 
-    private static Task HandleApiExceptionAsync(HttpContext context,string message)
+    private static Task HandleApiExceptionAsync(HttpContext context, string message)
     {
         context.Response.ContentType = ContentType;
         context.Response.StatusCode = ErrorResponseStatusCode;
 
-        var res = new ErrorResponse<string>(message)
-            { Code = context.Response.StatusCode };
-        var json = JsonConvert.SerializeObject(res);
+        var res = new ErrorResponse(context.Response.StatusCode, message);
+        var jsonString = JsonSerializer.Serialize(res, JsonSerializerOptions);
 
-        return context.Response.WriteAsync(json);
+        return context.Response.WriteAsync(jsonString);
     }
 
     private static void HandleNonApiException(HttpContext context)
     {
         context.Response.Redirect("/Error"); // 將用戶重定向到錯誤頁面
     }
+
+    private static JsonSerializerOptions JsonSerializerOptions => new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        AllowTrailingCommas = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 }
