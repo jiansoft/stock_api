@@ -53,9 +53,9 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     }
 
     /// <summary>
-    /// 取得股票產業分類
+    /// 取得股票歷年發放股利
     /// </summary>
-    /// <returns>股票產業分類</returns>
+    /// <returns>歷年發放股利</returns>
     [HttpGet]
     [Route("dividend/{stockSymbol}")]
     [ProducesResponseType<IResponse<IPayload<IEnumerable<DividendDto>>>>(StatusCodes.Status200OK)]
