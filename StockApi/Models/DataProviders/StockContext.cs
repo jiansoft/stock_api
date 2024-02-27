@@ -31,18 +31,10 @@ public class StockContext : DbContext
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="optionsBuilder"></param>
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    /// <param name="builder"></param>
+    protected override void OnConfiguring(DbContextOptionsBuilder builder)
     {
-        optionsBuilder
-            .UseNpgsql(Connection)
-            .EnableSensitiveDataLogging()
-            .UseLoggerFactory(LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddConsole()
-                    .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
-            }));
+        builder.UseNpgsql(Connection);
     }
 
     /// <summary>

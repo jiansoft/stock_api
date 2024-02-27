@@ -6,7 +6,7 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 表示用於獲取股票數據的請求參數類別。
 /// </summary>
 /// <param name="req"></param>
-public struct StocksParam(AbstractPagingRequest req) : IKey
+internal struct StocksParam(AbstractPagingRequest req) : IKey
 {
     private string BaseKey { get; set; } = req.KeyWithPrefix();
 

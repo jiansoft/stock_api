@@ -1,6 +1,4 @@
-﻿using StockApi.Models.HttpTransactions.Stock.Industry;
-
-namespace StockApi.Models.DataProviders.Stocks;
+﻿namespace StockApi.Models.DataProviders.Stocks;
 
 internal struct IndustriesParam(IKey req) : IKey
 {

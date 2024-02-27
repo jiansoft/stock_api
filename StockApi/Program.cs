@@ -72,14 +72,16 @@ try
     {
         opt.UseNpgsql(builder.Configuration.GetConnectionString("StockContext"))
             .EnableSensitiveDataLogging()
-            .UseLoggerFactory(LoggerFactory.Create(configure =>
-            {
-                configure
-                    .AddConsole()
-                    .AddFilter(
-                        DbLoggerCategory.Database.Command.Name,
-                        Microsoft.Extensions.Logging.LogLevel.Information);
-            }));
+            .UseLoggerFactory(
+                LoggerFactory.Create(
+                    configure =>
+                    {
+                        configure
+                            .AddConsole()
+                            .AddFilter(
+                                DbLoggerCategory.Database.Command.Name,
+                                Microsoft.Extensions.Logging.LogLevel.Information);
+                    }));
     });
 
     builder.Services.AddScoped<StockContext>();

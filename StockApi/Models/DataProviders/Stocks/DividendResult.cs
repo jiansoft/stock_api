@@ -6,7 +6,7 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 代表股利結果的類別
 /// </summary>
 /// <param name="entities"></param>
-public class DividendResult(IEnumerable<DividendEntity> entities)
+internal class DividendResult(IEnumerable<DividendEntity> entities)
 {
     /// <summary>
     /// 初始化股利結果的新執行個體

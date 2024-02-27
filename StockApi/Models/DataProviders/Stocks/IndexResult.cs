@@ -8,5 +8,5 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// </summary>
 /// <param name="meta"></param>
 /// <param name="entities"></param>
-public class IndexResult(Meta meta, IEnumerable<IndexEntity> entities)
+internal class IndexResult(Meta meta, IEnumerable<IndexEntity> entities)
     : AbstractPagingDataResult<IEnumerable<IndexEntity>>(meta, entities);

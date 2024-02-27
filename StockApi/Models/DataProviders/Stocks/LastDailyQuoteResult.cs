@@ -8,5 +8,5 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// </summary>
 /// <param name="meta"></param>
 /// <param name="entities"></param>
-public class LastDailyQuoteResult(Meta meta, IEnumerable<LastDailyQuoteEntity> entities) 
+internal class LastDailyQuoteResult(Meta meta, IEnumerable<LastDailyQuoteEntity> entities) 
     : AbstractPagingDataResult<IEnumerable<LastDailyQuoteEntity>>(meta, entities);

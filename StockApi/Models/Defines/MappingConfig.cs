@@ -7,7 +7,7 @@ namespace StockApi.Models.Defines;
 /// <summary>
 /// 
 /// </summary>
-internal class MappingConfig : TypeAdapterConfig
+internal abstract class MappingConfig : TypeAdapterConfig
 {
     /// <summary>
     /// 

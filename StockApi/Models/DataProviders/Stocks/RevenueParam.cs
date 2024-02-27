@@ -6,7 +6,7 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 表示用於營收請求的參數的結構
 /// </summary>
 /// <param name="req"></param>
-public struct RevenueParam(RevenueRequest req) : IKey
+internal struct RevenueParam(RevenueRequest req) : IKey
 {
     /// <summary>
     /// 取得或設定基本鍵值

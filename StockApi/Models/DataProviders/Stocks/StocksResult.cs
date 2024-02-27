@@ -8,5 +8,5 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// </summary>
 /// <param name="meta">元數據</param>
 /// <param name="entities">股票實體集合</param>
-public class StocksResult(Meta meta, IEnumerable<StockEntity> entities)
+internal class StocksResult(Meta meta, IEnumerable<StockEntity> entities)
     : AbstractPagingDataResult<IEnumerable<StockEntity>>(meta, entities);

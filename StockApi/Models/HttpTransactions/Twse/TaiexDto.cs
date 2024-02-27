@@ -1,11 +1,8 @@
-﻿using StockApi.Models.Entities;
-
-namespace StockApi.Models.HttpTransactions.Twse;
+﻿namespace StockApi.Models.HttpTransactions.Twse;
 
 /// <summary>
 /// 代表台灣加權股價指數的資料傳輸對象，用於封裝指數實體的相關資訊。
 /// </summary>
-/// <param name="ie">指數實體，包含台灣加權股價指數的資料。</param>
 public class TaiexDto
 {
     /// <summary>

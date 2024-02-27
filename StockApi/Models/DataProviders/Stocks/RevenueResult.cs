@@ -8,7 +8,7 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// <param name="meta"></param>
 /// <param name="entities"></param>
 /// <typeparam name="T">實際的資料型別</typeparam>
-public class RevenueResult<T>(Meta meta, T entities) : IDataResult<T>
+internal class RevenueResult<T>(Meta meta, T entities) : IDataResult<T>
 {
     /// <summary>
     /// 取得或設定 Meta 資訊

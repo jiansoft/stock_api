@@ -8,8 +8,6 @@
 public class LastDailyQuoteRequest(int? requestedPage, int? recordsPerPage)
     : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
-    
-
     /// <summary>
     /// 返回包含前綴的鍵值，用於唯一標識該分頁請求。
     /// </summary>

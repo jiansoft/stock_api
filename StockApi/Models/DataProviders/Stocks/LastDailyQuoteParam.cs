@@ -6,7 +6,7 @@ namespace StockApi.Models.DataProviders.Stocks;
 ///  用於表示最後每日報價的參數結構。
 /// </summary>
 /// <param name="req"></param>
-public struct LastDailyQuoteParam(AbstractPagingRequest req) : IKey
+internal struct LastDailyQuoteParam(AbstractPagingRequest req) : IKey
 {
     private string BaseKey { get; set; } = req.KeyWithPrefix();
 

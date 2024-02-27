@@ -4,7 +4,7 @@
 /// 代表組態參數的結構
 /// </summary>
 /// <param name="key"></param>
-public struct ConfigParam(string key) : IKey
+internal struct ConfigParam(string key) : IKey
 {
     /// <summary>
     /// 取得或設定組態參數的鍵
