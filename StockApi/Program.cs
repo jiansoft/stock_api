@@ -95,8 +95,10 @@ try
 
     builder.Services.AddMemoryCache();
     
-    builder.Services.AddSingleton(MappingConfig.RegisterMappings());
-    builder.Services.AddSingleton<IMapper, ServiceMapper>();
+    //builder.Services.AddSingleton(MappingConfig.RegisterMappings());
+    //builder.Services.AddSingleton<IMapper, ServiceMapper>();
+    
+    builder.Services.RegisterMapsterConfiguration();
     
     builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
@@ -178,7 +179,7 @@ public class StockService(
             async () =>
             {
                 var result = await gs.FetchHolidayScheduleAsync(req.Year);
-                var data = mapper.Map<IEnumerable<HolidayScheduleDto>>(result);
+                var data = result.AsQueryable().ProjectToType<HolidayScheduleDto>();
                 var payload = new HolidaySchedulePayload<IEnumerable<HolidayScheduleDto>>(data);
                 var response =
                     new HolidayScheduleResponse<IPayload<IEnumerable<HolidayScheduleDto>>>(payload)
