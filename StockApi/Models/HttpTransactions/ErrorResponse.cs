@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="Message">包含的錯誤訊息或相關數據。</param>
 /// <typeparam name="T">錯誤訊息或相關數據的類型。</typeparam>
-public record ErrorResponse(int Code, string Message) : IHttpTransaction
+internal record ErrorResponse(int Code, string Message) : IHttpTransaction
 {
     /// <inheritdoc />
     public string KeyWithPrefix()

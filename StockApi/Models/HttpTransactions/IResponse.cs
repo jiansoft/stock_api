@@ -6,15 +6,15 @@
 /// <typeparam name="T">響應中負載數據的類型。</typeparam>
 internal interface IResponse<T> : IHttpTransaction
 {
-    /// <summary>
-    /// 響應的狀態碼，用於表示請求處理的結果。
-    /// </summary>
-    public int Code { get; set; }
+ /// <summary>
+ /// 響應的狀態碼，用於表示請求處理的結果。
+ /// </summary>
+ int Code { get; set; }
 
-    /// <summary>
-    /// 響應中包含的負載數據。
-    /// </summary>
-    public T Payload { get; set; }
+ /// <summary>
+ /// 響應中包含的負載數據。
+ /// </summary>
+ T Payload { get; set; }
 }
 
 /// <summary>
@@ -23,13 +23,13 @@ internal interface IResponse<T> : IHttpTransaction
 /// <typeparam name="T"></typeparam>
 internal interface IResponseV1<T> : IHttpTransaction
 {
-    /// <summary>
-    /// 響應的狀態碼，用於表示請求處理的結果。
-    /// </summary>
-     int Code { get; init; }
+ /// <summary>
+ /// 響應的狀態碼，用於表示請求處理的結果。
+ /// </summary>
+ int Code { get; init; }
 
-    /// <summary>
-    /// 響應中包含的負載數據。
-    /// </summary>
-     T Payload { get; init; }
+ /// <summary>
+ /// 響應中包含的負載數據。
+ /// </summary>
+ T Payload { get; init; }
 }

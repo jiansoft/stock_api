@@ -72,20 +72,18 @@ try
     {
         opt.UseNpgsql(builder.Configuration.GetConnectionString("StockContext"))
             .EnableSensitiveDataLogging()
-            .UseLoggerFactory(
-                LoggerFactory.Create(
-                    configure =>
-                    {
-                        configure
-                            .AddConsole()
-                            .AddFilter(
-                                DbLoggerCategory.Database.Command.Name,
-                                Microsoft.Extensions.Logging.LogLevel.Information);
-                    }));
+            .UseLoggerFactory(LoggerFactory.Create(configure =>
+            {
+                configure
+                    .AddConsole()
+                    .AddFilter(
+                        DbLoggerCategory.Database.Command.Name,
+                        Microsoft.Extensions.Logging.LogLevel.Information);
+            }));
     });
 
     builder.Services.AddScoped<StockContext>();
-    
+
     builder.Services.AddSingleton<CacheDataProvider>();
     builder.Services.AddSingleton<StocksDataProvider>();
 
@@ -94,17 +92,15 @@ try
     builder.Services.AddSingleton<TwseService>();
 
     builder.Services.AddMemoryCache();
-    
-    //builder.Services.AddSingleton(MappingConfig.RegisterMappings());
-    //builder.Services.AddSingleton<IMapper, ServiceMapper>();
-    
-    builder.Services.RegisterMapsterConfiguration();
-    
+
+    builder.Services.AddSingleton(MapsterConfig.RegisterMappings());
+    builder.Services.AddSingleton<IMapper, ServiceMapper>();
+
     builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-    builder.Services.AddCors(options =>
+    builder.Services.AddCors(opt =>
     {
-        options.AddPolicy("CorsPolicy",
+        opt.AddPolicy("CorsPolicy",
             policy =>
             {
                 policy.AllowAnyHeader()
@@ -116,13 +112,13 @@ try
     var app = builder.Build();
 
     app.UseMiddleware<ExceptionMiddleware>();
-    
+
     app.Use(async (context, next) =>
     {
         context.Request.EnableBuffering();
         await next();
     });
-    
+
     app.UseForwardedHeaders(new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -158,11 +154,10 @@ try
     logger.Debug($"{app.Environment.EnvironmentName}");
 
     await app.RunAsync();
-
 }
 catch (Exception exception)
 {
-    logger.Error(exception, "Stopped program because of exception");
+    logger.Error(exception, exception.Message);
     throw;
 }
 finally

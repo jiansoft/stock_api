@@ -9,5 +9,5 @@ internal interface IKey
     /// 生成並返回一個包含特定前綴的唯一鍵值。此方法用於識別並區分不同的數據請求或實體。
     /// </summary>
     /// <returns>格式化的具有前綴的唯一鍵值字串。</returns>
-    public string KeyWithPrefix();
+    string KeyWithPrefix();
 }
