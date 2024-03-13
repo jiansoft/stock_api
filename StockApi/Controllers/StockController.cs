@@ -19,6 +19,7 @@ namespace StockApi.Controllers;
 /// <param name="sc"></param>
 [Route("api/stock")]
 [ApiController]
+[Produces("application/json")]
 public class StockController(StockService ss, StockContext sc) : ControllerBase
 {
     /// <summary>

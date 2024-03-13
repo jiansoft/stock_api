@@ -13,6 +13,7 @@ namespace StockApi.Controllers;
 /// <param name="sc">股票數據的上下文，用於訪問數據庫。</param>
 [Route("api/twse")]
 [ApiController]
+[Produces("application/json")]
 public class TwseController(TwseService ts, StockContext sc) : ControllerBase
 {
     /// <summary>

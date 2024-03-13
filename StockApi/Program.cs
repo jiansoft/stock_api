@@ -1,6 +1,7 @@
 using MapsterMapper;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using StockApi.Middlewares;
@@ -27,6 +28,19 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(option =>
     {
+        option.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1.0.1",
+            Title = "股票資訊服務",
+            Description = "本平臺提供歷年台股資訊服務，歡迎各位介接使用。",
+            Contact = new OpenApiContact
+            {
+                Name = "jIAn",
+                Email = "eddiea.chen@gmail.com",
+                Url = new Uri("https://github.com/jiansoft/stock_api")
+            }
+        });
+        
         var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         option.IncludeXmlComments(xmlPath);
@@ -61,7 +75,7 @@ try
         });
 
         option.DescribeAllParametersInCamelCase();
-
+        option.CustomSchemaIds(x => x.FullName);
     });
 
     builder.Services.Configure<GrpcOptions>(builder.Configuration.GetSection("GRPC"));
