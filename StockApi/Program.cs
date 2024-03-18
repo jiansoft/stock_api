@@ -165,7 +165,7 @@ try
 
     app.UseCors("CorsPolicy");
 
-    logger.Debug($"{app.Environment.EnvironmentName}");
+    logger.Debug($"Environment:{app.Environment.EnvironmentName}");
 
     await app.RunAsync();
 }

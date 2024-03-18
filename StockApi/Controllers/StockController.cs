@@ -64,7 +64,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     {
         var request = new DividendRequest(stockSymbol);
 
-        return Ok(ss.GetDividendResponse(request));
+        return Ok(ss.GetDividendResponse(request, sc));
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     {
         var request = new LastDailyQuoteRequest(requestedPage, recordsPerPage);
 
-        return Ok(ss.GetLastDailyQuoteResponse(request));
+        return Ok(ss.GetLastDailyQuoteResponse(request, sc));
     }
 
     /// <summary>

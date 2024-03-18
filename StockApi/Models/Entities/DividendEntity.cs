@@ -60,7 +60,7 @@ public class DividendEntity
     /// </summary>
     public decimal CashDividend { get; set; }
 
-    /// <summary>
+    /*/// <summary>
     /// 盈餘分配率_現金
     /// </summary>
     public decimal PayoutRatioCash { get; set; }
@@ -68,7 +68,7 @@ public class DividendEntity
     /// <summary>
     /// 盈餘分配率_股要(%)
     /// </summary>
-    public decimal PayoutRatioStock { get; set; }
+    public decimal PayoutRatioStock { get; set; }*/
 
     /// <summary>
     /// 盈餘分配率(%)

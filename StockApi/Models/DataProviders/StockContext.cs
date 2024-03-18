@@ -56,10 +56,24 @@ public class StockContext : DbContext
     /// 
     /// </summary>
     public DbSet<StockEntity> Stocks { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public DbSet<ConfigEntity> Configs { get; set; } 
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ConfigEntity>(entity =>
+        {
+            entity.ToTable("config");
+
+            entity.HasKey(e => e.Key).HasName("config_pkey");
+            entity.Property(e => e.Key).HasColumnName("key").HasComment("鍵名");
+            entity.Property(e => e.Val).HasColumnName("val").HasComment("值");
+        });
+        
         modelBuilder.Entity<IndexEntity>(entity =>
         {
             entity.ToTable("index");

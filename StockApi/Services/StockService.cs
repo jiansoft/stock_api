@@ -78,12 +78,12 @@ public class StockService(
     /// </summary>
     /// <param name="req">查詢參數</param>
     /// <returns>股票歷年發放股利</returns>
-    internal IHttpTransaction GetDividendResponse(DividendRequest req)
+    internal IHttpTransaction GetDividendResponse(DividendRequest req, StockContext sc)
     {
         return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)), () =>
         {
             var param = new DividendParam(req);
-            var result = sdp.GetDividend(param);
+            var result = sdp.GetDividend(param, sc);
             var data = result.Entities.Select(s => new DividendDto(s));
             var payload = new DividendPayload<IEnumerable<DividendDto>>(data);
             var response = new DividendResponse<IPayload<IEnumerable<DividendDto>>>(payload)
@@ -100,7 +100,7 @@ public class StockService(
     /// </summary>
     /// <param name="req">包含查詢條件的請求對象</param>
     /// <returns>包含每日報價數據的回應</returns>
-    internal IHttpTransaction GetLastDailyQuoteResponse(LastDailyQuoteRequest req)
+    internal IHttpTransaction GetLastDailyQuoteResponse(LastDailyQuoteRequest req, StockContext sc)
     {
         return cdp.GetOrSet(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             () =>
@@ -108,7 +108,7 @@ public class StockService(
                 var paramLastDailyQuote = new LastDailyQuoteParam(req);
                 var result = sdp.GetLastDailyQuote(paramLastDailyQuote);
                 var paramConfig = new ConfigParam(Constants.KeyLastClosingKay);
-                var config = sdp.GetConfig(paramConfig);
+                var config = sdp.GetConfig(paramConfig,sc);
                 var data = mapper.Map<IEnumerable<LastDailyQuoteDto>>(result.Result);
                 var payload = new LastDailyQuotePayload<LastDailyQuoteDto>(config.Entity.Val, result.Meta, data);
                 var response = new LastDailyQuoteResponse<IPagingPayload<LastDailyQuoteDto>>(payload)
