@@ -36,12 +36,20 @@ public record Meta
     public Meta(long recordCount, long requestedPage, long recordsPerPage)
     {
         RecordCount = recordCount;
+        RecordsPerPage = recordsPerPage <= 0 ? Constants.DefaultRecordsPerPage : recordsPerPage;
 
-        if (RecordCount <= 0) return;
+        // 如果沒有記錄，直接返回
+        if (recordCount <= 0)
+        {
+            PageCount = Constants.Zero;
+            RequestedPage = Constants.DefaultRequestedPage;
+            return;
+        }
 
         // 計算總頁數
-        PageCount = (int)Math.Ceiling(recordCount / (decimal)recordsPerPage);
-        RequestedPage = Math.Min(Math.Max(requestedPage, Constants.DefaultRequestedPage), PageCount);
-        RecordsPerPage = recordsPerPage;
+        PageCount = (long)Math.Ceiling((decimal)recordCount / recordsPerPage);
+
+        // 確保請求的頁碼在合理範圍內
+        RequestedPage = Math.Clamp(requestedPage, Constants.DefaultRequestedPage, PageCount);
     }
 }
