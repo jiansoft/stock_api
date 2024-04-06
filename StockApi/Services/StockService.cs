@@ -29,15 +29,16 @@ public class StockService(
     IMapper mapper,
     GrpcService gs)
 {
+    private static readonly int[] ExchangeMarketId = [2, 4, 5];
+    
     internal async Task<IHttpTransaction> GetDetailsAsync(DetailsRequest req, StockContext sc)
     {
         return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)),
             async () =>
             {
-                var condition = new[] { 2, 4, 5 };
-                var totalRecords = await sc.Stocks.CountAsync(w => condition.Contains(w.ExchangeMarketId));
+                var totalRecords = await sc.Stocks.CountAsync(w => ExchangeMarketId.Contains(w.ExchangeMarketId));
                 var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
-                var query = sc.Stocks.Where(w => condition.Contains(w.ExchangeMarketId))
+                var query = sc.Stocks.Where(w => ExchangeMarketId.Contains(w.ExchangeMarketId))
                     .OrderBy(ob => ob.ExchangeMarketId)
                     .ThenBy(tb => tb.IndustryId)
                     .ThenBy(tb => tb.StockSymbol)
@@ -77,6 +78,7 @@ public class StockService(
     /// 股票歷年發放股利
     /// </summary>
     /// <param name="req">查詢參數</param>
+    /// <param name="sc"></param>
     /// <returns>股票歷年發放股利</returns>
     internal IHttpTransaction GetDividendResponse(DividendRequest req, StockContext sc)
     {
@@ -99,6 +101,7 @@ public class StockService(
     /// 提供最後的每日報價數據。
     /// </summary>
     /// <param name="req">包含查詢條件的請求對象</param>
+    /// <param name="sc"></param>
     /// <returns>包含每日報價數據的回應</returns>
     internal IHttpTransaction GetLastDailyQuoteResponse(LastDailyQuoteRequest req, StockContext sc)
     {
