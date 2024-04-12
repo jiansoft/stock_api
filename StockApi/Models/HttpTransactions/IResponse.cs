@@ -16,20 +16,3 @@ internal interface IResponse<T> : IHttpTransaction
  /// </summary>
  T Payload { get; set; }
 }
-
-/// <summary>
-/// 
-/// </summary>
-/// <typeparam name="T"></typeparam>
-internal interface IResponseV1<T> : IHttpTransaction
-{
- /// <summary>
- /// 響應的狀態碼，用於表示請求處理的結果。
- /// </summary>
- int Code { get; init; }
-
- /// <summary>
- /// 響應中包含的負載數據。
- /// </summary>
- T Payload { get; init; }
-}

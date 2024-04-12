@@ -3,13 +3,13 @@
 /// <summary>
 /// 表示用於回應詳細數據的泛型類別。
 /// </summary>
-/// <param name="Code"></param>
-/// <param name="Payload"></param>
+/// <param name="code"></param>
+/// <param name="payload"></param>
 /// <typeparam name="T">數據類型</typeparam>
-public record DetailsResponse<T>(int Code, T Payload) : IResponseV1<T>
+public class DetailsResponse<T>(int code, T payload) : AbstractPagingResponse<T>(code, payload)
 {
     /// <inheritdoc />
-    public string KeyWithPrefix()
+    public override string KeyWithPrefix()
     {
         return $"{nameof(DetailsResponse<T>)}-{typeof(T).Name}";
     }

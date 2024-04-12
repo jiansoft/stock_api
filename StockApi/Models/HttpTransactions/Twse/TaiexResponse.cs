@@ -3,13 +3,13 @@
 /// <summary>
 /// 
 /// </summary>
-/// <param name="Code"></param>
-/// <param name="Payload"></param>
+/// <param name="code"></param>
+/// <param name="payload"></param>
 /// <typeparam name="T"></typeparam>
-public record TaiexResponse<T>(int Code, T Payload) : IResponseV1<T>
+public class TaiexResponse<T>(int code, T payload) : AbstractPagingResponse<T>(code, payload)
 {
     /// <inheritdoc />
-    public string KeyWithPrefix()
+    public override string KeyWithPrefix()
     {
         return $"{nameof(TaiexResponse<T>)}-{typeof(T).Name}";
     }

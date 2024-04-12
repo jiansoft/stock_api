@@ -16,7 +16,7 @@ public class DividendPayload<T>(T data) : IPayload<T>
 /// </summary>
 /// <param name="data"></param>
 /// <typeparam name="T"></typeparam>
-public class DividendResponse<T>(T data) : IResponse<T>
+public class DividendResponse<T>(int code,T data) : IResponse<T>
 {
     /// <inheritdoc />
     public string KeyWithPrefix()
@@ -25,7 +25,7 @@ public class DividendResponse<T>(T data) : IResponse<T>
     }
 
     /// <inheritdoc />
-    public int Code { get; set; }
+    public int Code { get; set; } = code;
 
     /// <inheritdoc />
     public T Payload { get; set; } = data;
