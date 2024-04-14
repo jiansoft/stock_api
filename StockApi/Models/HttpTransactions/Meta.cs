@@ -10,17 +10,17 @@ public record Meta
     /// <summary>
     /// 請求的頁碼。
     /// </summary>
-    public long RequestedPage { get; set; }
+    public int RequestedPage { get; set; }
 
     /// <summary>
     /// 每頁的記錄數。
     /// </summary>
-    public long RecordsPerPage { get; set; }
+    public int RecordsPerPage { get; set; }
 
     /// <summary>
     /// 總頁數。
     /// </summary>
-    public long PageCount { get; set; }
+    public int PageCount { get; set; }
 
     /// <summary>
     /// 總記錄數。
@@ -33,7 +33,7 @@ public record Meta
     /// <param name="recordCount">總記錄數。</param>
     /// <param name="requestedPage">請求的頁碼。</param>
     /// <param name="recordsPerPage">每頁的記錄數。</param>
-    public Meta(long recordCount, long requestedPage, long recordsPerPage)
+    public Meta(long recordCount, int requestedPage, int recordsPerPage)
     {
         RecordCount = recordCount;
         RecordsPerPage = recordsPerPage <= 0 ? Constants.DefaultRecordsPerPage : recordsPerPage;
@@ -47,7 +47,7 @@ public record Meta
         }
 
         // 計算總頁數
-        PageCount = (long)Math.Ceiling((decimal)recordCount / recordsPerPage);
+        PageCount = (int)Math.Ceiling((decimal)recordCount / recordsPerPage);
 
         // 確保請求的頁碼在合理範圍內
         RequestedPage = Math.Clamp(requestedPage, Constants.DefaultRequestedPage, PageCount);

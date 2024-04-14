@@ -29,7 +29,8 @@ public class TwseService(CacheDataProvider cdp, TypeAdapterConfig config)
             {
                 var totalRecords = await sc.Indexes.CountAsync(w => w.Category == req.Category);
                 var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
-                var data = await sc.Indexes.Where(w => w.Category == req.Category)
+                var data = await sc.Indexes
+                    .Where(w => w.Category == req.Category)
                     .OrderByDescending(ob => ob.Date)
                     .Skip((int)((meta.RequestedPage - 1) * meta.RecordsPerPage))
                     .Take((int)meta.RecordsPerPage)
