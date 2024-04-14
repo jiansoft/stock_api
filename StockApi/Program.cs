@@ -109,7 +109,7 @@ try
 
     builder.Services.AddMemoryCache();
 
-    builder.Services.AddSingleton(MapsterConfig.RegisterMappings());
+    builder.Services.AddSingleton(MapsterConfig.GetConfig());
     builder.Services.AddSingleton<IMapper, ServiceMapper>();
 
     builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
