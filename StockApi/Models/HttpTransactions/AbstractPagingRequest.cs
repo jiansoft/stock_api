@@ -7,12 +7,12 @@ namespace StockApi.Models.HttpTransactions;
 /// </summary>
 /// <param name="requestedPage">請求的頁碼。</param>
 /// <param name="recordsPerPage">每頁的記錄數量。</param>
-public abstract class AbstractPagingRequest(int? requestedPage, int? recordsPerPage) : IRequest
+public abstract class AbstractPagingRequest(uint? requestedPage, int? recordsPerPage) : IRequest
 {
     /// <summary>
     /// 經過驗證的請求頁碼，確保頁碼有效。
     /// </summary>
-    public int RequestedPage { get; private set; } = ValidateRequestedPage(requestedPage);
+    public uint RequestedPage { get; private set; } = ValidatePageIndex(requestedPage);
 
     /// <summary>
     /// 經過驗證的每頁記錄數，確保數量在允許範圍內。
@@ -24,9 +24,9 @@ public abstract class AbstractPagingRequest(int? requestedPage, int? recordsPerP
     /// </summary>
     /// <param name="requestedPage">待驗證的請求頁碼。</param>
     /// <returns>有效的請求頁碼。</returns>
-    private static int ValidateRequestedPage(int? requestedPage)
+    private static uint ValidatePageIndex(uint? requestedPage)
     {
-        return requestedPage is null or <= 0 ? Constants.DefaultRequestedPage : requestedPage.Value;
+        return requestedPage is null or <= 0 ? Constants.DefaultPage : requestedPage.Value;
     }
 
     /// <summary>

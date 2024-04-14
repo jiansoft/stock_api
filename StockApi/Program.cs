@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog;
+using NLog.Extensions.Logging;
 using NLog.Web;
 using StockApi.Middlewares;
 using StockApi.Models;
@@ -90,6 +91,7 @@ try
             {
                 configure
                     .AddConsole()
+                    .AddNLog()
                     .AddFilter(
                         DbLoggerCategory.Database.Command.Name,
                         Microsoft.Extensions.Logging.LogLevel.Information);

@@ -24,9 +24,8 @@ namespace StockApi.Services;
 /// <param name="mapper">物件對應器，用於在不同的數據模型之間進行轉換。</param>
 /// <param name="gs">gRPC提供者</param>
 public class StockService(
-    StocksDataProvider sdp,
-    CacheDataProvider cdp,
-    IMapper mapper,
+    StocksDataProvider sdp, CacheDataProvider cdp,
+    IMapper mapper, TypeAdapterConfig config,
     GrpcService gs)
 {
     private static readonly int[] ExchangeMarketId = [2, 4, 5];
@@ -36,20 +35,21 @@ public class StockService(
         return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(1)),
             async () =>
             {
-                var totalRecords = await sc.Stocks.CountAsync(w => ExchangeMarketId.Contains(w.ExchangeMarketId));
+                var totalRecords = await sc.Stocks.LongCountAsync(w => ExchangeMarketId.Contains(w.ExchangeMarketId));
                 var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
-                var query = sc.Stocks.Where(w => ExchangeMarketId.Contains(w.ExchangeMarketId))
+                var data = await sc.Stocks
+                    .Where(w => ExchangeMarketId.Contains(w.ExchangeMarketId))
                     .OrderBy(ob => ob.ExchangeMarketId)
                     .ThenBy(tb => tb.IndustryId)
                     .ThenBy(tb => tb.StockSymbol)
-                    .Skip((int)((meta.RequestedPage - 1) * meta.RecordsPerPage))
-                    .Take((int)meta.RecordsPerPage)
-                    .AsNoTrackingWithIdentityResolution();
-                var data = await mapper.ProjectTo<DetailDto>(query).ToListAsync();
+                    .Skip(meta.Offset)
+                    .Take(meta.RecordsPerPage)
+                    .AsNoTrackingWithIdentityResolution()
+                    .ProjectToType<DetailDto>(config)
+                    .ToListAsync();
                 var payload = new PagingPayload<DetailDto>(meta, data);
-                var response = new DetailsResponse<IPagingPayload<DetailDto>>(StatusCodes.Status200OK, payload);
-
-                return response;
+              
+                return new DetailsResponse<IPagingPayload<DetailDto>>(StatusCodes.Status200OK, payload);
             });
     }
 

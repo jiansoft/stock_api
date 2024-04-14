@@ -12,7 +12,7 @@ public abstract class Constants
     /// <summary>
     /// 預設第一頁
     /// </summary>
-    public const int DefaultRequestedPage = 1;
+    public const uint DefaultPage = 1;
 
     /// <summary>
     /// 預設每頁30筆

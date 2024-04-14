@@ -57,7 +57,7 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
                  where d.security_code = {param.StockSymbol}
                  order by d.year desc, year_of_dividend desc, d.quarter desc
                  """).ToList();
-            
+
             return new DividendResult(qq);
         });
 
@@ -134,10 +134,7 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
     internal ConfigResult GetConfig(ConfigParam param, StockContext sc)
     {
         var result = cdp.GetOrSet(param.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
-            () =>
-            {
-                return new ConfigResult(sc.Configs.Single(w => w.Key == param.Key));
-            });
+            () => { return new ConfigResult(sc.Configs.Single(w => w.Key == param.Key)); });
 
         return result;
     }
@@ -290,7 +287,7 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
                 }
 
                 queryParams.AddRange([
-                    db.Parameter("@pi", (param.PageIndex - 1) * param.PageSize, DbType.Int64),
+                    db.Parameter("@pi", meta.Offset, DbType.Int64),
                     db.Parameter("@ps", param.PageSize, DbType.Int64),
                 ]);
 
@@ -315,7 +312,8 @@ public class StocksDataProvider(CacheDataProvider cdp) : DbDataProvider
                     """ + where + """
                                   order by "Date" desc, "SecurityCode"
                                   offset @pi limit @ps;
-                                  """, queryParams.ToArray()));
+                                  """,
+                    queryParams.ToArray()));
             });
 
         return result;

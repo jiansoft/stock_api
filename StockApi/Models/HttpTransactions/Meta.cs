@@ -8,48 +8,54 @@ namespace StockApi.Models.HttpTransactions;
 public record Meta
 {
     /// <summary>
-    /// 請求的頁碼。
+    /// 目前顯示的頁碼。
     /// </summary>
-    public int RequestedPage { get; set; }
+    public uint CurrentPage { get; }
 
     /// <summary>
-    /// 每頁的記錄數。
+    /// 於資料庫查詢時顯示第幾頁的索引，實際為 CurrentPage -1 ，最小值 0
     /// </summary>
-    public int RecordsPerPage { get; set; }
+    private uint PageIndex { get; }
+
+    /// <summary>
+    /// 資料查詢時的偏移量 (meta.CurrentPage - 1) * meta.RecordsPerPage
+    /// </summary>
+    internal int Offset { get; }
+
+    /// <summary>
+    /// 每頁顯示幾筆數據。
+    /// </summary>
+    public int RecordsPerPage { get; }
 
     /// <summary>
     /// 總頁數。
     /// </summary>
-    public int PageCount { get; set; }
+    public uint TotalPages { get; }
 
     /// <summary>
     /// 總記錄數。
     /// </summary>
-    public long RecordCount { get; set; }
+    public long TotalRecords { get; }
 
     /// <summary>
     /// 建構函數，用於初始化分頁的元數據。
     /// </summary>
-    /// <param name="recordCount">總記錄數。</param>
+    /// <param name="totalRecords">總記錄數。</param>
     /// <param name="requestedPage">請求的頁碼。</param>
     /// <param name="recordsPerPage">每頁的記錄數。</param>
-    public Meta(long recordCount, int requestedPage, int recordsPerPage)
+    public Meta(long totalRecords, uint requestedPage, int recordsPerPage)
     {
-        RecordCount = recordCount;
-        RecordsPerPage = recordsPerPage <= 0 ? Constants.DefaultRecordsPerPage : recordsPerPage;
-
-        // 如果沒有記錄，直接返回
-        if (recordCount <= 0)
-        {
-            PageCount = Constants.Zero;
-            RequestedPage = Constants.DefaultRequestedPage;
-            return;
-        }
-
+        TotalRecords = totalRecords;
+        RecordsPerPage = recordsPerPage < 1 ? Constants.DefaultRecordsPerPage : recordsPerPage;
         // 計算總頁數
-        PageCount = (int)Math.Ceiling((decimal)recordCount / recordsPerPage);
-
+        TotalPages = TotalRecords > 0
+            ? (uint)Math.Ceiling((decimal)TotalRecords / RecordsPerPage)
+            : Constants.Zero;
         // 確保請求的頁碼在合理範圍內
-        RequestedPage = Math.Clamp(requestedPage, Constants.DefaultRequestedPage, PageCount);
+        CurrentPage = TotalPages > 0
+            ? Math.Clamp(requestedPage, Constants.DefaultPage, TotalPages)
+            : Constants.DefaultPage;
+        PageIndex =  CurrentPage - 1;
+        Offset = (int)(PageIndex * RecordsPerPage);
     }
 }

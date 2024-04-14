@@ -13,7 +13,7 @@ internal struct LastDailyQuoteParam(AbstractPagingRequest req) : IKey
     /// <summary>
     /// 取得或設定頁碼。
     /// </summary>
-    public int PageIndex { get; set; } = req.RequestedPage;
+    public uint PageIndex { get; set; } = req.RequestedPage;
 
     /// <summary>
     /// 取得或設定每頁筆數。

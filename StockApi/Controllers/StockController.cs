@@ -31,7 +31,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("details")]
     [ProducesResponseType<IResponse<IPagingPayload<DetailDto>>>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Details(int? requestedPage, int? recordsPerPage)
+    public async Task<IActionResult> Details(uint? requestedPage, int? recordsPerPage)
     {
         var request = new DetailsRequest(requestedPage, recordsPerPage);
         var response = await ss.GetDetailsAsync(request, sc);
@@ -48,7 +48,8 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [ProducesResponseType<IResponse<IPayload<IEnumerable<IndustryDto>>>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Industries()
     {
-        var response = await ss.GetIndustriesAsync(new IndustriesRequest(), sc);
+        var request = new IndustriesRequest();
+        var response = await ss.GetIndustriesAsync(request, sc);
 
         return Ok(response);
     }
@@ -63,8 +64,9 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     public IActionResult Dividend(string stockSymbol)
     {
         var request = new DividendRequest(stockSymbol);
-
-        return Ok(ss.GetDividendResponse(request, sc));
+        var response = ss.GetDividendResponse(request, sc);
+        
+        return Ok(response);
     }
 
     /// <summary>
@@ -76,11 +78,12 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("last_daily_quote")]
     [ProducesResponseType<IResponse<IPagingPayload<LastDailyQuoteDto>>>(StatusCodes.Status200OK)]
-    public IActionResult LastDailyQuote(int? requestedPage, int? recordsPerPage)
+    public IActionResult LastDailyQuote(uint? requestedPage, int? recordsPerPage)
     {
         var request = new LastDailyQuoteRequest(requestedPage, recordsPerPage);
+        var response = ss.GetLastDailyQuoteResponse(request, sc);
 
-        return Ok(ss.GetLastDailyQuoteResponse(request, sc));
+        return Ok(response);
     }
 
     /// <summary>
@@ -93,14 +96,15 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("historical_daily_quote/{date}")]
     [ProducesResponseType<IResponse<IPagingPayload<HistoricalDailyQuoteDto>>>(StatusCodes.Status200OK)]
-    public IActionResult HistoricalDailyQuote(DateOnly date, int? requestedPage, int? recordsPerPage)
+    public IActionResult HistoricalDailyQuote(DateOnly date, uint? requestedPage, int? recordsPerPage)
     {
         var request = new HistoricalDailyQuoteRequest(requestedPage, recordsPerPage)
         {
             Date = date
         };
-
-        return Ok(ss.GetHistoricalDailyQuoteResponse(request));
+        var response = ss.GetHistoricalDailyQuoteResponse(request);
+        
+        return Ok(response);
     }
 
     /// <summary>
@@ -113,14 +117,15 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("revenue_on/{monthOfYear:int}")]
     [ProducesResponseType<IResponse<IPagingPayload<RevenueDto>>>(StatusCodes.Status200OK)]
-    public IActionResult Revenue(int monthOfYear, int? requestedPage, int? recordsPerPage)
+    public IActionResult Revenue(int monthOfYear, uint? requestedPage, int? recordsPerPage)
     {
         var request = new RevenueRequest(requestedPage, recordsPerPage)
         {
             MonthOfYear = monthOfYear
         };
+        var response = ss.GetRevenueResponse(request);
 
-        return Ok(ss.GetRevenueResponse(request));
+        return Ok(response);
     }
 
     /// <summary>
@@ -133,14 +138,15 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("revenue_by/{stockSymbol}")]
     [ProducesResponseType<IResponse<IPagingPayload<RevenueDto>>>(StatusCodes.Status200OK)]
-    public IActionResult Revenue(string stockSymbol, int? requestedPage, int? recordsPerPage)
+    public IActionResult Revenue(string stockSymbol, uint? requestedPage, int? recordsPerPage)
     {
         var request = new RevenueRequest(requestedPage, recordsPerPage)
         {
             StockSymbol = stockSymbol
         };
-
-        return Ok(ss.GetRevenueResponse(request));
+        var response = ss.GetRevenueResponse(request);
+        
+        return Ok(response);
     }
 
     /// <summary>

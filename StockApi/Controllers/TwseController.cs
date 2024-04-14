@@ -25,7 +25,7 @@ public class TwseController(TwseService ts, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("taiex")]
     [ProducesResponseType<IResponse<IPagingPayload<TaiexDto>>>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Taiex(int? requestedPage, int? recordsPerPage)
+    public async Task<IActionResult> Taiex(uint? requestedPage, int? recordsPerPage)
     {
         var request = new TaiexRequest(requestedPage, recordsPerPage);
         var response = await ts.GetTaiexAsync(request, sc);

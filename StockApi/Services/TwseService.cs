@@ -27,13 +27,13 @@ public class TwseService(CacheDataProvider cdp, TypeAdapterConfig config)
             CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             async () =>
             {
-                var totalRecords = await sc.Indexes.CountAsync(w => w.Category == req.Category);
+                var totalRecords = await sc.Indexes.LongCountAsync(w => w.Category == req.Category);
                 var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
                 var data = await sc.Indexes
                     .Where(w => w.Category == req.Category)
                     .OrderByDescending(ob => ob.Date)
-                    .Skip((int)((meta.RequestedPage - 1) * meta.RecordsPerPage))
-                    .Take((int)meta.RecordsPerPage)
+                    .Skip(meta.Offset)
+                    .Take(meta.RecordsPerPage)
                     .AsNoTrackingWithIdentityResolution()
                     .ProjectToType<TaiexDto>(config)
                     .ToListAsync();
