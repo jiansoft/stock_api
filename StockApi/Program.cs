@@ -111,9 +111,7 @@ try
 
     builder.Services.AddSingleton(MapsterConfig.GetConfig());
     builder.Services.AddSingleton<IMapper, ServiceMapper>();
-
-    builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
+    
     builder.Services.AddCors(opt =>
     {
         opt.AddPolicy("CorsPolicy",

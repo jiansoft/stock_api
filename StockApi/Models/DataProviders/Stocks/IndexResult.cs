@@ -7,6 +7,6 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 代表索引結果的類別
 /// </summary>
 /// <param name="meta"></param>
-/// <param name="entities"></param>
-internal class IndexResult(Meta meta, IEnumerable<IndexEntity> entities)
-    : AbstractPagingDataResult<IEnumerable<IndexEntity>>(meta, entities);
+/// <param name="rows"></param>
+internal class IndexResult(Meta meta, IEnumerable<IndexEntity> rows)
+    : AbstractPagingDataResult<IEnumerable<IndexEntity>>(meta, rows);

@@ -9,5 +9,5 @@ public interface IDataResult<T>
     /// <summary>
     ///  取得或設定結果
     /// </summary>
-    T Result { get; set; }
+    T Rows { get; set; }
 }

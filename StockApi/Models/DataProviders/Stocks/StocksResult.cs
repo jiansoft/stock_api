@@ -7,6 +7,6 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 表示用於表示股票查詢結果的類別。
 /// </summary>
 /// <param name="meta">元數據</param>
-/// <param name="entities">股票實體集合</param>
-internal class StocksResult(Meta meta, IEnumerable<StockEntity> entities)
-    : AbstractPagingDataResult<IEnumerable<StockEntity>>(meta, entities);
+/// <param name="rows">股票實體集合</param>
+internal class StocksResult(Meta meta, IEnumerable<StockEntity> rows)
+    : AbstractPagingDataResult<IEnumerable<StockEntity>>(meta, rows);

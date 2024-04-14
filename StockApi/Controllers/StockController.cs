@@ -129,7 +129,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     }
 
     /// <summary>
-    /// 取得歷史的收盤股價
+    /// 取得營收相關數據
     /// </summary>
     /// <param name="stockSymbol">指定股票</param>
     /// <param name="requestedPage">取得第幾頁的數據</param>

@@ -7,6 +7,6 @@ namespace StockApi.Models.DataProviders.Stocks;
 /// 代表歷史每日報價結果的類別
 /// </summary>
 /// <param name="meta"></param>
-/// <param name="entities"></param>
-internal class HistoricalDailyQuoteResult(Meta meta, IEnumerable<HistoricalDailyQuoteEntity> entities) 
-    : AbstractPagingDataResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, entities);
+/// <param name="rows"></param>
+internal class HistoricalDailyQuoteResult(Meta meta, IEnumerable<HistoricalDailyQuoteEntity> rows) 
+    : AbstractPagingDataResult<IEnumerable<HistoricalDailyQuoteEntity>>(meta, rows);

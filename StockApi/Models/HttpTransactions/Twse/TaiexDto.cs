@@ -10,7 +10,6 @@ public class TaiexDto
     /// </summary>
     public TaiexDto()
     {
-        
     }
     
     /// <summary>

@@ -1,7 +1,8 @@
-﻿using Mapster;
+﻿using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
+using StockApi.Models.Entities;
 using StockApi.Models.HttpTransactions;
 using StockApi.Models.HttpTransactions.Twse;
 
@@ -11,8 +12,8 @@ namespace StockApi.Services;
 /// 提供台灣證券交易所相關服務的類別，負責從數據來源獲取和處理台灣加權股價指數（TAIEX）等相關數據。
 /// </summary>
 /// <param name="cdp">緩存數據提供者，用於緩存台灣證券交易所的數據，提高數據訪問效率。</param>
-/// <param name="config">物件對應設定，用於在不同的數據模型之間進行轉換。</param>
-public class TwseService(CacheDataProvider cdp, TypeAdapterConfig config)
+/// <param name="mapper">物件對應設定，用於在不同的數據模型之間進行轉換。</param>
+public class TwseService(CacheDataProvider cdp,  IMapper mapper)
 {
     /// <summary>
     /// 獲取台灣加權股價指數的回應。此方法從數據源中獲取台灣加權股價指數的數據，並透過緩存提高數據訪問效率。
@@ -29,14 +30,14 @@ public class TwseService(CacheDataProvider cdp, TypeAdapterConfig config)
             {
                 var totalRecords = await sc.Indexes.LongCountAsync(w => w.Category == req.Category);
                 var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
-                var data = await sc.Indexes
+                var result = await sc.Indexes
                     .Where(w => w.Category == req.Category)
                     .OrderByDescending(ob => ob.Date)
                     .Skip(meta.Offset)
                     .Take(meta.RecordsPerPage)
                     .AsNoTrackingWithIdentityResolution()
-                    .ProjectToType<TaiexDto>(config)
                     .ToListAsync();
+                var data = mapper.Map<IEnumerable<IndexEntity>,IEnumerable<TaiexDto>>(result);
                 var payload = new PagingPayload<TaiexDto>(meta, data);
                 var response = new TaiexResponse<IPagingPayload<TaiexDto>>(StatusCodes.Status200OK, payload);
 

@@ -27,5 +27,5 @@ public abstract class Constants
     /// <summary>
     /// 用於檢索最後收盤日期的關鍵字。
     /// </summary>
-    public const string KeyLastClosingKay = "last-closing-day";
+    public const string KeyLastClosing = "last-closing-day";
 }

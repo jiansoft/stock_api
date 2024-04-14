@@ -1,10 +1,11 @@
-﻿using AutoMapper;
-using Mapster;
+﻿using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Stock;
 using StockApi.Models;
 using StockApi.Models.DataProviders;
 using StockApi.Models.DataProviders.Stocks;
 using StockApi.Models.Defines;
+using StockApi.Models.Entities;
 using StockApi.Models.HttpTransactions;
 using StockApi.Models.HttpTransactions.Stock.Details;
 using StockApi.Models.HttpTransactions.Stock.Dividend;
@@ -21,12 +22,8 @@ namespace StockApi.Services;
 /// </summary>
 /// <param name="sdp">股票數據提供者，用於從數據源獲取股票數據。</param>
 /// <param name="cdp">緩存數據提供者，用於緩存和檢索股票數據。</param>
-/// <param name="mapper">物件對應器，用於在不同的數據模型之間進行轉換。</param>
 /// <param name="gs">gRPC提供者</param>
-public class StockService(
-    StocksDataProvider sdp, CacheDataProvider cdp,
-    IMapper mapper, TypeAdapterConfig config,
-    GrpcService gs)
+public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, GrpcService gs, IMapper mapper)
 {
     private static readonly int[] ExchangeMarketId = [2, 4, 5];
 
@@ -37,7 +34,7 @@ public class StockService(
             {
                 var totalRecords = await sc.Stocks.LongCountAsync(w => ExchangeMarketId.Contains(w.ExchangeMarketId));
                 var meta = new Meta(totalRecords, req.RequestedPage, req.RecordsPerPage);
-                var data = await sc.Stocks
+                var result = await sc.Stocks
                     .Where(w => ExchangeMarketId.Contains(w.ExchangeMarketId))
                     .OrderBy(ob => ob.ExchangeMarketId)
                     .ThenBy(tb => tb.IndustryId)
@@ -45,10 +42,10 @@ public class StockService(
                     .Skip(meta.Offset)
                     .Take(meta.RecordsPerPage)
                     .AsNoTrackingWithIdentityResolution()
-                    .ProjectToType<DetailDto>(config)
                     .ToListAsync();
+                var data = mapper.Map<IEnumerable<StockEntity>, IEnumerable<DetailDto>>(result);
                 var payload = new PagingPayload<DetailDto>(meta, data);
-              
+
                 return new DetailsResponse<IPagingPayload<DetailDto>>(StatusCodes.Status200OK, payload);
             });
     }
@@ -64,12 +61,13 @@ public class StockService(
         return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(TimeSpan.FromDays(30)),
             async () =>
             {
-                var result = await sc.Industries.AsNoTrackingWithIdentityResolution().ToListAsync();
-                var data = mapper.Map<List<IndustryDto>>(result);
-                var payload = new IndustriesPayload<List<IndustryDto>>(data);
-                var response = new IndustriesResponse<IPayload<List<IndustryDto>>>(StatusCodes.Status200OK, payload);
+                var result = await sc.Industries
+                    .AsNoTrackingWithIdentityResolution()
+                    .ToListAsync();
+                var data = mapper.Map<IEnumerable<StockIndustryEntity>, IEnumerable<IndustryDto>>(result);
+                var payload = new IndustriesPayload<IEnumerable<IndustryDto>>(data);
 
-                return response;
+                return new IndustriesResponse<IPayload<IEnumerable<IndustryDto>>>(StatusCodes.Status200OK, payload);
             });
     }
 
@@ -85,11 +83,10 @@ public class StockService(
         {
             var param = new DividendParam(req);
             var result = sdp.GetDividend(param, sc);
-            var data = result.Entities.Select(s => new DividendDto(s));
+            var data = mapper.Map<IEnumerable<DividendEntity>, IEnumerable<DividendDto>>(result.Entities);
             var payload = new DividendPayload<IEnumerable<DividendDto>>(data);
-            var response = new DividendResponse<IPayload<IEnumerable<DividendDto>>>(StatusCodes.Status200OK, payload);
 
-            return response;
+            return new DividendResponse<IPayload<IEnumerable<DividendDto>>>(StatusCodes.Status200OK, payload);
         });
     }
 
@@ -106,16 +103,15 @@ public class StockService(
             {
                 var paramLastDailyQuote = new LastDailyQuoteParam(req);
                 var result = sdp.GetLastDailyQuote(paramLastDailyQuote);
-                var paramConfig = new ConfigParam(Constants.KeyLastClosingKay);
-                var config = sdp.GetConfig(paramConfig, sc);
-                var data = mapper.Map<IEnumerable<LastDailyQuoteDto>>(result.Result);
-                var payload = new LastDailyQuotePayload<LastDailyQuoteDto>(config.Entity.Val, result.Meta, data);
-                var response = new LastDailyQuoteResponse<IPagingPayload<LastDailyQuoteDto>>(payload)
+                var paramConfig = new ConfigParam(Constants.KeyLastClosing);
+                var lastClose = sdp.GetConfig(paramConfig, sc);
+                var data = mapper.Map<IEnumerable<LastDailyQuoteEntity>, IEnumerable<LastDailyQuoteDto>>(result.Rows);
+                var payload = new LastDailyQuotePayload<LastDailyQuoteDto>(lastClose.Entity.Val, result.Meta, data);
+
+                return new LastDailyQuoteResponse<IPagingPayload<LastDailyQuoteDto>>(payload)
                 {
                     Code = StatusCodes.Status200OK
                 };
-
-                return response;
             });
     }
 
@@ -130,16 +126,14 @@ public class StockService(
             () =>
             {
                 var param = new HistoricalDailyQuoteParam(req);
-                var result = sdp.GetHistoricalDailyQuote(param);
-                var data = mapper.Map<IEnumerable<HistoricalDailyQuoteDto>>(result.Result);
-                var payload = new PagingPayload<HistoricalDailyQuoteDto>(result.Meta, data);
-                var response =
-                    new HistoricalDailyQuoteResponse<IPagingPayload<HistoricalDailyQuoteDto>>(payload)
-                    {
-                        Code = StatusCodes.Status200OK
-                    };
+                var r = sdp.GetHistoricalDailyQuote(param);
+                var data = mapper.Map<IEnumerable<HistoricalDailyQuoteEntity>, IList<HistoricalDailyQuoteDto>>(r.Rows);
+                var payload = new PagingPayload<HistoricalDailyQuoteDto>(r.Meta, data);
 
-                return response;
+                return new HistoricalDailyQuoteResponse<IPagingPayload<HistoricalDailyQuoteDto>>(payload)
+                {
+                    Code = StatusCodes.Status200OK
+                };
             });
     }
 
@@ -155,14 +149,13 @@ public class StockService(
             {
                 var param = new RevenueParam(req);
                 var result = sdp.GetRevenue(param);
-                var data = mapper.Map<IEnumerable<RevenueDto>>(result.Result);
+                var data = mapper.Map<IEnumerable<RevenueEntity>, IEnumerable<RevenueDto>>(result.Rows);
                 var payload = new PagingPayload<RevenueDto>(result.Meta, data);
-                var response = new RevenueResponse<IPagingPayload<RevenueDto>>(payload)
+
+                return new RevenueResponse<IPagingPayload<RevenueDto>>(payload)
                 {
                     Code = StatusCodes.Status200OK
                 };
-
-                return response;
             });
     }
 
@@ -171,20 +164,20 @@ public class StockService(
     /// </summary>
     /// <param name="req"></param>
     /// <returns></returns>
-    internal async Task<IHttpTransaction> GetHolidayScheduleResponseAsync(HolidayScheduleRequest req)
+    internal async Task<IHttpTransaction> GetHolidayScheduleResponseAsync(
+        StockApi.Models.HttpTransactions.Stock.HolidaySchedule.HolidayScheduleRequest req)
     {
         return await cdp.GetOrSetAsync(req.KeyWithPrefix(), CacheDataProvider.NewOption(Utils.GetNextTimeDiff(15)),
             async () =>
             {
                 var result = await gs.FetchHolidayScheduleAsync(req.Year);
-                var data = result.AsQueryable().ProjectToType<HolidayScheduleDto>();
+                var data = mapper.Map<IEnumerable<HolidaySchedule>, IEnumerable<HolidayScheduleDto>>(result);
                 var payload = new HolidaySchedulePayload<IEnumerable<HolidayScheduleDto>>(data);
-                var response = new HolidayScheduleResponse<IPayload<IEnumerable<HolidayScheduleDto>>>(payload)
+                
+                return new HolidayScheduleResponse<IPayload<IEnumerable<HolidayScheduleDto>>>(payload)
                 {
                     Code = StatusCodes.Status200OK
                 };
-                
-                return response;
             });
     }
 }

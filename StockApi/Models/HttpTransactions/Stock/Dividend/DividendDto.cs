@@ -77,4 +77,11 @@ public class DividendDto(DividendEntity de)
     /// EPS
     /// </summary>
     public decimal EarningsPerShare { get; set; } = de.EarningsPerShare;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public DividendDto():this(new DividendEntity())
+    {
+    }
 }

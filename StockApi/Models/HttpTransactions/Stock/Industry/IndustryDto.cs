@@ -11,10 +11,10 @@ public class IndustryDto(StockIndustryEntity ie)
     /// <summary>
     /// 初始化 <see cref="IndustryDto"/> 類別的新執行個體。
     /// </summary>
-    public IndustryDto():this(new StockIndustryEntity())
+    public IndustryDto() : this(new StockIndustryEntity())
     {
     }
-    
+
     /// <summary>
     /// 產業編號
     /// </summary>

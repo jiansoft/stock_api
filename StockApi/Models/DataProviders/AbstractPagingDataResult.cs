@@ -8,7 +8,7 @@ namespace StockApi.Models.DataProviders;
 /// 這個抽象類別可以被用於不同類型的數據集合，以支持分頁功能，
 /// 例如在網頁應用或API響應中顯示數據的子集。
 /// </summary>
-internal abstract class AbstractPagingDataResult<T>(Meta meta, T entities) : IDataResult<T> where T : IEnumerable
+internal abstract class AbstractPagingDataResult<T>(Meta meta, T rows) : IDataResult<T> where T : IEnumerable
 {
     /// <summary>
     /// 分頁的元數據，提供了有關數據集合分頁的詳細信息，例如當前頁碼、每頁大小和總頁數。
@@ -16,5 +16,5 @@ internal abstract class AbstractPagingDataResult<T>(Meta meta, T entities) : IDa
     public Meta Meta { get; } = meta;
 
     /// <inheritdoc />
-    public T Result { get; set; } = entities;
+    public T Rows { get; set; } = rows;
 }
