@@ -23,6 +23,7 @@ namespace StockApi.Services;
 /// <param name="sdp">股票數據提供者，用於從數據源獲取股票數據。</param>
 /// <param name="cdp">緩存數據提供者，用於緩存和檢索股票數據。</param>
 /// <param name="gs">gRPC提供者</param>
+/// <param name="mapper">物件對應器，用於在不同的數據模型之間進行轉換。</param>
 public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, GrpcService gs, IMapper mapper)
 {
     private static readonly int[] ExchangeMarketId = [2, 4, 5];

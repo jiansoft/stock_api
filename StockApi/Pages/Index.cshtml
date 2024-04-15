@@ -8,7 +8,7 @@
     var options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(100));
     //You can also use .SetSlidingExpiration
 
-    var message = "Hello " + DateTimeOffset.UtcNow.ToString();
+    var message = "Hello " + DateTimeOffset.UtcNow;
     Cache.Set("MyCache", message, options);
 }
 
