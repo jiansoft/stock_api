@@ -14,6 +14,7 @@ public class GrpcOptions
     /// 
     /// </summary>
     public string HttpProtocol { get; set; } = string.Empty;
+    
     /// <summary>
     /// 
     /// </summary>

@@ -3,7 +3,7 @@
 /// <summary>
 /// 用於表示每日報價的實體類別。
 /// </summary>
-public class DailyQuoteEntity
+public class DailyQuoteEntity : IEntity
 {
     /// <summary>
     /// 市場編號

@@ -17,6 +17,7 @@ public record DbOptions
     /// 
     /// </summary>
     public string ProviderName { get; set; } = string.Empty;
+    
     /// <summary>
     /// 
     /// </summary>

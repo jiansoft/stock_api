@@ -3,7 +3,7 @@
 /// <summary>
 /// 代表營收實體的類別
 /// </summary>
-public class RevenueEntity
+public class RevenueEntity : IEntity
 {
     /// <summary>
     /// 股票代號

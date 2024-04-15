@@ -12,7 +12,7 @@ using StockApi.Models.HttpTransactions.Twse;
 
 namespace StockApi.Models.Defines;
 
-internal abstract class MapsterConfig : TypeAdapterConfig
+internal abstract class MapsterConfig 
 {
     // 靜態欄位來儲存組態實例
     private static readonly TypeAdapterConfig Config;

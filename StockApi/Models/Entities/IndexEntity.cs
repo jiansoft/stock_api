@@ -5,7 +5,7 @@ namespace StockApi.Models.Entities;
 /// <summary>
 /// 代表股市指數的實體類別，包含與股市指數相關的各項數據。
 /// </summary>
-public class IndexEntity
+public class IndexEntity : IEntity
 {
     /// <summary>
     /// 

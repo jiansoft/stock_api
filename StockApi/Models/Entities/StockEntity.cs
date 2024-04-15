@@ -7,7 +7,7 @@ namespace StockApi.Models.Entities;
 /// 代表股票實體的類別
 /// </summary>
 [Table("stocks")]
-public sealed class StockEntity
+public sealed class StockEntity : IEntity
 {
     /// <summary>
     /// 取得或設定交易市場的編號
@@ -54,10 +54,10 @@ public sealed class StockEntity
     /// <summary>
     /// 
     /// </summary>
-    public StockIndustryEntity? Industry { get; set; } 
-    
+    public StockIndustryEntity? Industry { get; set; }
+
     /// <summary>
     /// 
     /// </summary>
-    public StockExchangeMarketEntity? ExchangeMarket{ get; set; } 
+    public StockExchangeMarketEntity? ExchangeMarket { get; set; }
 }

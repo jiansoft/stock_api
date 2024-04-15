@@ -3,7 +3,7 @@
 /// <summary>
 /// 股利
 /// </summary>
-public class DividendEntity
+public class DividendEntity : IEntity
 {
     /// <summary>
     /// 除息日

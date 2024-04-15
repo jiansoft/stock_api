@@ -5,7 +5,7 @@ namespace StockApi.Models.Entities;
 /// <summary>
 /// 交易市場
 /// </summary>
-public sealed class StockExchangeMarketEntity
+public sealed class StockExchangeMarketEntity : IEntity
 {
     /// <summary>
     /// 交易所的市場編號

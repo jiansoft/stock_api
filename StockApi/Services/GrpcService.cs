@@ -10,9 +10,9 @@ namespace StockApi.Services;
 /// </summary>
 public class GrpcService
 {
-    private readonly ILogger<GrpcService> _logger;
-    private readonly IHostEnvironment _env;
     private readonly GrpcOptions _grpcOptions;
+    private readonly IHostEnvironment _env;
+    private readonly ILogger<GrpcService> _logger;
     private readonly Lazy<Stock.Stock.StockClient> _clientLazy;
 
     /// <summary>
@@ -25,9 +25,8 @@ public class GrpcService
     public GrpcService(ILogger<GrpcService> logger, IOptions<GrpcOptions> go, IHostEnvironment env)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _grpcOptions = go?.Value ?? throw new ArgumentNullException(nameof(go));
+        _grpcOptions = go.Value ?? throw new ArgumentNullException(nameof(go));
         _env = env ?? throw new ArgumentNullException(nameof(env));
-
         _clientLazy = new Lazy<Stock.Stock.StockClient>(CreateGrpcClient, true);
     }
 
@@ -39,26 +38,36 @@ public class GrpcService
     {
         try
         {
-            var httpHandler = new HttpClientHandler();
-            // 在開發環境中，忽略SSL憑證驗證錯誤
-            if (_env.IsDevelopment())
-            {
-                httpHandler.ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-            }
+            var httpHandler = CreateHttpClientHandler();
+            var channel = GrpcChannel.ForAddress(
+                $"{_grpcOptions.HttpProtocol}{_grpcOptions.RustGrpcTarget}:{_grpcOptions.RustGrpcTargetPort}",
+                new GrpcChannelOptions { HttpHandler = httpHandler });
 
-            var channel =
-                GrpcChannel.ForAddress(
-                    $"{_grpcOptions.HttpProtocol}{_grpcOptions.RustGrpcTarget}:{_grpcOptions.RustGrpcTargetPort}",
-                    new GrpcChannelOptions { HttpHandler = httpHandler });
             return new Stock.Stock.StockClient(channel);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to initialize gRPC client: {Message}", ex.Message);
-            throw; 
+            _logger.LogError(ex, "Failed to initialize gRPC client for target {Target} on port {Port}: {Message}",
+                _grpcOptions.RustGrpcTarget, _grpcOptions.RustGrpcTargetPort, ex.Message);
+
+            throw;
+        }
+
+        HttpClientHandler CreateHttpClientHandler()
+        {
+            var handler = new HttpClientHandler();
+            if (_env.IsDevelopment())
+            {
+                // 在開發環境中，忽略SSL憑證驗證錯誤
+                handler.ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            }
+
+            return handler;
         }
     }
+
+
 
     /// <summary>
     /// 獲取gRPC客戶端實例。
@@ -75,6 +84,7 @@ public class GrpcService
         var reply = await Client
             .FetchHolidayScheduleAsync(new HolidayScheduleRequest { Year = year })
             .ConfigureAwait(false);
+
         return reply.Holiday;
     }
 }
