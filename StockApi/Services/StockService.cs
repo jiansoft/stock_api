@@ -41,7 +41,7 @@ public class StockService(StocksDataProvider sdp, CacheDataProvider cdp, GrpcSer
                     .ThenBy(tb => tb.IndustryId)
                     .ThenBy(tb => tb.StockSymbol)
                     .Skip(meta.Offset)
-                    .Take(meta.RecordsPerPage)
+                    .Take(meta.PageSize)
                     .AsNoTrackingWithIdentityResolution()
                     .ToListAsync();
                 var data = mapper.Map<IEnumerable<StockEntity>, IEnumerable<DetailDto>>(result);

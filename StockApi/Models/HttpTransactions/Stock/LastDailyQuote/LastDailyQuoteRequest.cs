@@ -3,9 +3,9 @@
 /// <summary>
 /// 用於取得最後的收盤股價封裝分頁請求的詳細資訊。
 /// </summary>
-/// <param name="page"></param>
+/// <param name="requestedPage"></param>
 /// <param name="recordsPerPage"></param>
-public class LastDailyQuoteRequest(uint? requestedPage, int? recordsPerPage)
+public class LastDailyQuoteRequest(uint? requestedPage, uint? recordsPerPage)
     : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
     /// <summary>

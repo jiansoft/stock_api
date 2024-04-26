@@ -14,6 +14,7 @@ public class DividendPayload<T>(T data) : IPayload<T>
 /// <summary>
 /// 表示股利回應的對象。
 /// </summary>
+/// <param name="code"></param>
 /// <param name="data"></param>
 /// <typeparam name="T"></typeparam>
 public class DividendResponse<T>(int code,T data) : IResponse<T>

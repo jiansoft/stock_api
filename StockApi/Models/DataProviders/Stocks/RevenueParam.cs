@@ -21,7 +21,7 @@ internal struct RevenueParam(RevenueRequest req) : IKey
     /// <summary>
     /// 取得或設定每頁筆數
     /// </summary>
-    public int PageSize { get; set; } = req.RecordsPerPage;
+    public uint PageSize { get; set; } = req.RecordsPerPage;
 
     /// <summary>
     /// 取得或設定年月

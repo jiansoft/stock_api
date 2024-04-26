@@ -6,7 +6,7 @@ internal struct HistoricalDailyQuoteParam(HistoricalDailyQuoteRequest req) : IKe
 {
     private string BaseKey { get; set; } = req.KeyWithPrefix();
     public uint PageIndex { get; set; } = req.RequestedPage;
-    public int PageSize { get; set; } = req.RecordsPerPage;
+    public uint PageSize { get; set; } = req.RecordsPerPage;
     public DateOnly Date  { get; set; } = req.Date;
 
     public string KeyWithPrefix()

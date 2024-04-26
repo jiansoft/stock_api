@@ -3,9 +3,9 @@
 /// <summary>
 /// 表示歷史每日報價的請求類別。
 /// </summary>
-/// <param name="page">要求的頁碼。</param>
+/// <param name="requestedPage">要求的頁碼。</param>
 /// <param name="recordsPerPage">每頁的記錄數。</param>
-public class HistoricalDailyQuoteRequest(uint? requestedPage, int? recordsPerPage)
+public class HistoricalDailyQuoteRequest(uint? requestedPage, uint? recordsPerPage)
     : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
     /// <summary>

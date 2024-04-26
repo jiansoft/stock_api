@@ -31,7 +31,8 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("details")]
     [ProducesResponseType<IResponse<IPagingPayload<DetailDto>>>(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Details(uint? requestedPage, int? recordsPerPage)
+    [ProducesResponseType<ErrorResponse>(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Details(uint? requestedPage, uint? recordsPerPage)
     {
         var request = new DetailsRequest(requestedPage, recordsPerPage);
         var response = await ss.GetDetailsAsync(request, sc);
@@ -78,7 +79,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("last_daily_quote")]
     [ProducesResponseType<IResponse<IPagingPayload<LastDailyQuoteDto>>>(StatusCodes.Status200OK)]
-    public IActionResult LastDailyQuote(uint? requestedPage, int? recordsPerPage)
+    public IActionResult LastDailyQuote(uint? requestedPage, uint? recordsPerPage)
     {
         var request = new LastDailyQuoteRequest(requestedPage, recordsPerPage);
         var response = ss.GetLastDailyQuoteResponse(request, sc);
@@ -96,7 +97,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("historical_daily_quote/{date}")]
     [ProducesResponseType<IResponse<IPagingPayload<HistoricalDailyQuoteDto>>>(StatusCodes.Status200OK)]
-    public IActionResult HistoricalDailyQuote(DateOnly date, uint? requestedPage, int? recordsPerPage)
+    public IActionResult HistoricalDailyQuote(DateOnly date, uint? requestedPage, uint? recordsPerPage)
     {
         var request = new HistoricalDailyQuoteRequest(requestedPage, recordsPerPage)
         {
@@ -117,7 +118,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("revenue_on/{monthOfYear:int}")]
     [ProducesResponseType<IResponse<IPagingPayload<RevenueDto>>>(StatusCodes.Status200OK)]
-    public IActionResult Revenue(int monthOfYear, uint? requestedPage, int? recordsPerPage)
+    public IActionResult Revenue(int monthOfYear, uint? requestedPage, uint? recordsPerPage)
     {
         var request = new RevenueRequest(requestedPage, recordsPerPage)
         {
@@ -138,7 +139,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
     [HttpGet]
     [Route("revenue_by/{stockSymbol}")]
     [ProducesResponseType<IResponse<IPagingPayload<RevenueDto>>>(StatusCodes.Status200OK)]
-    public IActionResult Revenue(string stockSymbol, uint? requestedPage, int? recordsPerPage)
+    public IActionResult Revenue(string stockSymbol, uint? requestedPage, uint? recordsPerPage)
     {
         var request = new RevenueRequest(requestedPage, recordsPerPage)
         {

@@ -3,9 +3,9 @@
 /// <summary>
 ///  表示用於獲取收益數據的請求類別。
 /// </summary>
-/// <param name="page">請求的頁數</param>
+/// <param name="requestedPage">請求的頁數</param>
 /// <param name="recordsPerPage">每頁的記錄數</param>
-public class RevenueRequest(uint? requestedPage, int? recordsPerPage)
+public class RevenueRequest(uint? requestedPage, uint? recordsPerPage)
     : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
     /// <summary>

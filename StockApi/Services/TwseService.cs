@@ -34,7 +34,7 @@ public class TwseService(CacheDataProvider cdp,  IMapper mapper)
                     .Where(w => w.Category == req.Category)
                     .OrderByDescending(ob => ob.Date)
                     .Skip(meta.Offset)
-                    .Take(meta.RecordsPerPage)
+                    .Take(meta.PageSize)
                     .AsNoTrackingWithIdentityResolution()
                     .ToListAsync();
                 var data = mapper.Map<IEnumerable<IndexEntity>,IEnumerable<TaiexDto>>(result);

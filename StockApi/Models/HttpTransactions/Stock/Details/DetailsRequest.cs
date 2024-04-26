@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="requestedPage">請求的頁碼。</param>
 /// <param name="recordsPerPage">每頁的記錄數。</param>
-public class DetailsRequest(uint? requestedPage, int? recordsPerPage)
+public class DetailsRequest(uint? requestedPage, uint? recordsPerPage)
     : AbstractPagingRequest(requestedPage, recordsPerPage)
 {
     /// <inheritdoc />

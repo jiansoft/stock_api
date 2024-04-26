@@ -9,6 +9,7 @@ public abstract class Constants
     /// 0
     /// </summary>
     public const int Zero = 0;
+    
     /// <summary>
     /// 預設第一頁
     /// </summary>
@@ -17,7 +18,7 @@ public abstract class Constants
     /// <summary>
     /// 預設每頁30筆
     /// </summary>
-    public const int DefaultRecordsPerPage = 30;
+    public const uint DefaultRecordsPerPage = 30;
 
     /// <summary>
     /// 每頁最多1000筆
