@@ -1,6 +1,7 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+RUN ln -snf /usr/share/zoneinfo/Asia/Taipei /etc/localtime && echo Asia/Taipei > /etc/timezone
 USER app
 WORKDIR /app
 EXPOSE 7000
@@ -24,6 +25,5 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 VOLUME ["/app/logs"]
-RUN ln -snf /usr/share/zoneinfo/Asia/Taipei /etc/localtime && echo Asia/Taipei > /etc/timezone
 
 ENTRYPOINT ["dotnet", "StockApi.dll"]

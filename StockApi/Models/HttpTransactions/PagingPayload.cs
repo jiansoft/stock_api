@@ -6,11 +6,11 @@ namespace StockApi.Models.HttpTransactions;
 /// <param name="Meta">分頁的元數據。</param>
 /// <param name="Data">數據集合。</param>
 /// <typeparam name="T">數據的類型。</typeparam>
-internal record PagingPayload<T>(Meta Meta, IEnumerable<T> Data) : IPagingPayload<T>
-{
-    /// <inheritdoc />
-    public Meta Meta { get; set; } = Meta;
+    internal record PagingPayload<T>(Meta Meta, IEnumerable<T> Data) : IPagingPayload<T>
+    {
+        /// <inheritdoc />
+        public Meta Meta { get; set; } = Meta;
 
-    /// <inheritdoc />
-    public IEnumerable<T> Data { get; set; } = Data;
-}
+        /// <inheritdoc />
+        public IEnumerable<T> Data { get; set; } = Data;
+    }

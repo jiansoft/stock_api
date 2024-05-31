@@ -25,6 +25,7 @@ try
 
     builder.Services.AddRazorPages();
     builder.Services.AddControllers();
+    builder.Services.AddProblemDetails();
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(option =>
@@ -125,14 +126,9 @@ try
 
     var app = builder.Build();
 
+    //app.UseExceptionHandler();
     app.UseMiddleware<ExceptionMiddleware>();
-
-    app.Use(async (context, next) =>
-    {
-        context.Request.EnableBuffering();
-        await next();
-    });
-
+    
     app.UseForwardedHeaders(new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -144,6 +140,10 @@ try
         // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
 
+    }
+    else
+    {
+        app.UseDeveloperExceptionPage();
     }
 
     app.UseSwagger();
@@ -166,7 +166,7 @@ try
     app.UseCors("CorsPolicy");
 
     logger.Debug($"Environment:{app.Environment.EnvironmentName}");
-
+   
     await app.RunAsync();
 }
 catch (Exception exception)
