@@ -22,6 +22,10 @@ namespace StockApi.Controllers;
 [Produces("application/json")]
 public class StockController(StockService ss, StockContext sc) : ControllerBase
 {
+    /*
+     * 20240613-主線變更測試-1
+     */
+    
     /// <summary>
     /// 獲取股票基本資料
     /// </summary>
