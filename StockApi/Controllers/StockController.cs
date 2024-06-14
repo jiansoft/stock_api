@@ -23,12 +23,6 @@ namespace StockApi.Controllers;
 public class StockController(StockService ss, StockContext sc) : ControllerBase
 {
     /*
-     * 20240613-主線變更測試-1
-     * 20240613-分支變更測試-1
-     * 20240613-主線變更測試-2
-     * 20240613-分支變更測試-2
-     * 20240613-主線變更測試-3
-     * 20240613-分支變更測試-3
      * Stock-主線變更測試-4
      * Stock-分支變更測試-4
      * Stock-主線變更測試-5
