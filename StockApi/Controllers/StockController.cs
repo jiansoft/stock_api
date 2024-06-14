@@ -29,6 +29,7 @@ public class StockController(StockService ss, StockContext sc) : ControllerBase
      * 20240613-分支變更測試-2
      * 20240613-主線變更測試-3
      * 20240613-分支變更測試-3
+     * Stock-主線變更測試-4
      */
 
     /// <summary>
