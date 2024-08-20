@@ -58,13 +58,28 @@ public record Meta
         CurrentPage = CalculateCurrentPage(requestedPage, TotalPages);
     }
 
+    /// <summary>
+    /// 計算總頁數。
+    /// </summary>
+    /// <param name="totalRecords">總記錄數。</param>
+    /// <param name="recordsPerPage">每頁顯示的記錄數。</param>
+    /// <returns>總頁數。</returns>
     private static uint CalculateTotalPages(long totalRecords, uint recordsPerPage) =>
-        (uint)(totalRecords > Constants.Zero
-            ? Math.Ceiling((decimal)totalRecords / recordsPerPage)
-            : Constants.Zero);
+        totalRecords > Constants.Zero && recordsPerPage > Constants.Zero
+            ? (uint)Math.Ceiling(totalRecords / (double)recordsPerPage)
+            : Constants.Zero;
 
+    /// <summary>
+    /// 確保請求的頁碼在合理範圍內，如果請求的頁碼超出範圍，返回一個有效的頁碼。
+    /// </summary>
+    /// <param name="requestedPage">請求的頁碼。</param>
+    /// <param name="totalPages">總頁數。</param>
+    /// <returns>有效的頁碼。</returns>
     private static uint CalculateCurrentPage(uint requestedPage, uint totalPages) =>
-        totalPages > Constants.Zero
-            ? Math.Clamp(requestedPage, Constants.DefaultPage, totalPages)
-            : Constants.DefaultPage;
+        Math.Clamp(
+            requestedPage,
+            Constants.DefaultPage,
+            totalPages > Constants.Zero
+                ? totalPages
+                : Constants.DefaultPage);
 }
